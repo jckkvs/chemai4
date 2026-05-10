@@ -1,0 +1,8 @@
+﻿.claude/
+__pycache__/
+*.log
+*.bak
+exports/plots/
+frontend_nicegui/exports/plots/
+*.zip
+debug_samples/
