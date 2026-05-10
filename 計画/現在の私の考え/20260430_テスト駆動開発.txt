@@ -1,0 +1,7 @@
+C:\Users\horie\chemai2_cc\data\samples
+様々なデータに対して、テスト駆動開発をしたい
+
+・まずは"C:\Users\horie\chemai2_cc\data\samples\tabular_50_safe.csv"　から初めて全部やって
+
+機能面についてはLLM関係は難しいので、ＬＬＭを絡まない実装済み機能についてテスト駆動開発
+・その後ＬＬＭ関係についてテスト駆動開発

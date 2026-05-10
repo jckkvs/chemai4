@@ -1,0 +1,26 @@
+﻿SMILES,Compound_Name,logS,pIC50,Class,Source,Notes
+CC(=O)Oc1ccccc1C(=O)O,Compound_001,-2.428,4.881,0,Synthetic,Generated for testing
+CC(C)Cc1ccc(cc1)C(C)C(=O)O,Compound_002,-3.348,4.084,1,Synthetic,Generated for testing
+CN1C=NC2=C1C(=O)N(C(=O)N2C)C,Compound_003,-1.889,3.87,0,Synthetic,Generated for testing
+CC(C)CC1=CC=C(C=C1)C(C)C(=O)O,Compound_004,-2.916,4.532,1,Synthetic,Generated for testing
+CCO,Compound_005,-0.555,3.091,0,Synthetic,Generated for testing
+CC(C)O,Compound_006,-0.398,3.553,0,Synthetic,Generated for testing
+CC(C)(C)O,Compound_007,-0.925,3.048,0,Synthetic,Generated for testing
+c1ccccc1,Compound_008,-1.678,3.65,0,Synthetic,Generated for testing
+CC1=CC=CC=C1,Compound_009,-1.494,3.279,0,Synthetic,Generated for testing
+CC1=CC2=C(C=C1C=O)C(=O)C3=C(O2)C=CC(=C3)O,Compound_010,-2.778,5.182,1,Synthetic,Generated for testing
+CCC1=CC(=C(C=C1)O)C=O,Compound_011,-2.005,3.331,0,Synthetic,Generated for testing
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC,Compound_012,-13.085,10.309,1,Synthetic,Generated for testing
+C1CC1C1CC1C1CC1,Compound_013,-1.832,4.61,0,Synthetic,Generated for testing
+CC(=O)Oc1ccccc1C(=O)O,Compound_014,-2.748,4.363,0,Synthetic,Generated for testing
+CC(C)Cc1ccc(cc1)C(C)C(=O)O,Compound_015,-2.354,5.294,1,Synthetic,Generated for testing
+CN1C=NC2=C1C(=O)N(C(=O)N2C)C,Compound_016,-2.045,4.65,0,Synthetic,Generated for testing
+CC(C)CC1=CC=C(C=C1)C(C)C(=O)O,Compound_017,-2.682,4.651,1,Synthetic,Generated for testing
+CCO,Compound_018,-0.346,3.149,0,Synthetic,Generated for testing
+CC(C)O,Compound_019,-1.29,2.626,0,Synthetic,Generated for testing
+CC(C)(C)O,Compound_020,-1.312,2.941,0,Synthetic,Generated for testing
+c1ccccc1,Compound_021,-1.608,3.962,0,Synthetic,Generated for testing
+CC1=CC=CC=C1,Compound_022,-1.795,4.325,0,Synthetic,Generated for testing
+CC1=CC2=C(C=C1C=O)C(=O)C3=C(O2)C=CC(=C3)O,Compound_023,-4.076,4.854,1,Synthetic,Generated for testing
+CCC1=CC(=C(C=C1)O)C=O,Compound_024,-1.996,3.722,0,Synthetic,Generated for testing
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC,Compound_025,-12.637,10.154,1,Synthetic,Generated for testing

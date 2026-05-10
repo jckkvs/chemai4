@@ -1,0 +1,26 @@
+Sample_ID,Compound_1_SMILES,Compound_1_WT%,Compound_2_SMILES,Compound_2_WT%,Compound_3_SMILES,Compound_3_WT%,Target_Property,Notes
+MIX001,CCO,39.44,CC1=CC=CC=C1,23.85,c1ccccc1,36.71,2.002,Ethanol+Toluene+Benzene
+MIX002,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,33.74,CC(C)Cc1ccc(cc1)C(C)C(=O)O,35.56,CCC1=CC(=C(C=C1)O)C=O,30.70,6.936,Caffeine+Ibuprofen+Vanillin
+MIX003,CC1=CC=CC=C1,16.72,c1ccccc1,14.79,CC(C)Cc1ccc(cc1)C(C)C(=O)O,68.49,3.638,Toluene+Benzene+Ibuprofen
+MIX004,CC(C)O,46.60,CCC1=CC(=C(C=C1)O)C=O,27.93,CC1=CC=CC=C1,25.47,3.398,Isopropanol+Vanillin+Toluene
+MIX005,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,24.43,CCC1=CC(=C(C=C1)O)C=O,21.12,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,54.45,-2.469,Caffeine+Vanillin+Caffeine
+MIX006,CC1=CC=CC=C1,40.50,CC1=CC=CC=C1,27.14,CC(C)Cc1ccc(cc1)C(C)C(=O)O,32.36,1.257,Toluene+Toluene+Ibuprofen
+MIX007,CC(C)O,41.92,CCC1=CC(=C(C=C1)O)C=O,46.35,CC1=CC=CC=C1,11.73,5.129,Isopropanol+Vanillin+Toluene
+MIX008,CC(C)O,39.44,c1ccccc1,34.07,CC1=CC=CC=C1,26.50,3.106,Isopropanol+Benzene+Toluene
+MIX009,CCO,29.15,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,45.80,CC(C)Cc1ccc(cc1)C(C)C(=O)O,25.05,5.210,Ethanol+Caffeine+Ibuprofen
+MIX010,CCC1=CC(=C(C=C1)O)C=O,38.60,CCO,22.40,c1ccccc1,39.00,2.850,Vanillin+Ethanol+Benzene
+MIX011,CC(C)Cc1ccc(cc1)C(C)C(=O)O,50.25,CC1=CC=CC=C1,30.15,CCC1=CC(=C(C=C1)O)C=O,19.60,6.320,Ibuprofen+Toluene+Vanillin
+MIX012,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,60.00,CC(C)O,25.00,CCO,15.00,4.150,Caffeine+Isopropanol+Ethanol
+MIX013,c1ccccc1,33.33,CC1=CC=CC=C1,33.33,CCC1=CC(=C(C=C1)O)C=O,33.34,2.580,Benzene+Toluene+Vanillin equal
+MIX014,CCO,20.00,CC(C)O,30.00,CC1=CC=CC=C1,50.00,1.920,Ethanol+Isopropanol+Toluene
+MIX015,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,40.00,CCC1=CC(=C(C=C1)O)C=O,35.00,CC(C)Cc1ccc(cc1)C(C)C(=O)O,25.00,6.750,Caffeine+Vanillin+Ibuprofen
+MIX016,CC1=CC=CC=C1,45.60,c1ccccc1,32.40,CC(C)O,22.00,2.350,Toluene+Benzene+Isopropanol
+MIX017,CCC1=CC(=C(C=C1)O)C=O,55.00,CC(C)Cc1ccc(cc1)C(C)C(=O)O,25.00,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,20.00,6.980,Vanillin+Ibuprofen+Caffeine
+MIX018,CCO,48.75,CC1=CC=CC=C1,31.25,c1ccccc1,20.00,2.120,Ethanol+Toluene+Benzene
+MIX019,CC(C)O,37.50,CCO,37.50,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,25.00,3.680,Isopropanol+Ethanol+Caffeine
+MIX020,CC(C)Cc1ccc(cc1)C(C)C(=O)O,42.00,CCC1=CC(=C(C=C1)O)C=O,33.00,CC1=CC=CC=C1,25.00,6.450,Ibuprofen+Vanillin+Toluene
+MIX021,c1ccccc1,28.00,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,42.00,CC(C)O,30.00,3.420,Benzene+Caffeine+Isopropanol
+MIX022,CC1=CC=CC=C1,60.00,CCO,25.00,CCC1=CC(=C(C=C1)O)C=O,15.00,2.680,Toluene+Ethanol+Vanillin
+MIX023,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,35.00,CC(C)Cc1ccc(cc1)C(C)C(=O)O,40.00,c1ccccc1,25.00,5.880,Caffeine+Ibuprofen+Benzene
+MIX024,CCC1=CC(=C(C=C1)O)C=O,50.50,CC1=CC=CC=C1,29.50,CC(C)O,20.00,3.750,Vanillin+Toluene+Isopropanol
+MIX025,CCO,33.33,CC(C)O,33.33,CC1=CC=CC=C1,33.34,2.280,Ethanol+Isopropanol+Toluene equal

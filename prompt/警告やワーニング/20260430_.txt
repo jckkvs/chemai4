@@ -1,0 +1,38 @@
+[09:40:09] Starting AutoML...
+[09:40:09] データ品質チェック中...
+[09:40:09] 変数型を自動判定中...
+[09:40:09] タスク種別を判定中...
+[09:40:09] 複数モデルで学習中...
+[09:40:09] 学習中... (1/2: rf)
+[09:40:11] 学習中... (2/2: lgbm)
+[09:40:14] 最良モデル(rf)を全データで学習中...
+[09:40:16] 完了!
+✅ AutoML completed successfully
+Complete - Total time: 6.94 seconds
+Complete - Total time: 6.94 seconds
+Complete - Total time: 6.94 seconds
+Complete - Total time: 6.94 seconds
+Complete - Total time: 6.94 seconds
+Complete - Total time: 6.94 seconds
+Complete - Total time: 6.94 seconds
+Complete - Total time: 6.94 seconds
+Complete - Total time: 6.94 seconds
+Complete - Total time: 6.94 seconds
+Complete - Total time: 6.94 seconds
+Complete - Total time: 6.94 seconds
+Complete - Total time: 6.94 seconds
+Complete - Total time: 6.94 seconds
+Complete - Total time: 6.94 seconds
+Complete - Total time: 6.94 seconds
+
+無限に解析終了メッセージがでる（本当に解析し続けているのか、メッセージだけかは不明）
+
+
+
+VISUALISE　RESULTSをおすと
+
+Error: Specifying the columns using strings is only supported for dataframes.
+
+
+C:\Users\horie\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\sklearn\utils\validation.py:2691: UserWarning: X does not have valid feature names, but WrappedLGBMRegressor was fitted with feature names
+  warnings.warn(

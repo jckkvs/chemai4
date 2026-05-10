@@ -1,0 +1,19 @@
+説明変数が非常に多いときようの特殊パイプラインと
+通常のパイプラインとを両方設定できるといいね。
+で、かつそれがユーザーにとってわかりやすく可視化したい
+特徴量セット１ー通常パイプライン
+特徴量セット２ー通常パイプライン
+特徴量セット３ー特殊パイプライン
+特徴量セット４ー通常パイプライン
+みたいな感じ
+
+特殊パイプラインの場合は説明変数のrandomprojection(sklearn)
+GaussianRandomProjection
+
+Reduce dimensionality through Gaussian random projection.
+
+SparseRandomProjection
+
+Reduce dimensionality through sparse random projection.
+
+のどちらかを使え。　sparse randomのほうが比較的優れた手法ならそっちで

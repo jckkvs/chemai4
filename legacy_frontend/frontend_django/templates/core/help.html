@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}ヘルプ - ChemAI ML Studio{% endblock %}
+
+{% block content %}
+<h1 class="hero-title">❓ ヘルプ</h1>
+
+<div class="card">
+    <h2 style="margin-bottom:1rem;">使い方</h2>
+    <ol style="color:var(--text-secondary);line-height:2.2;">
+        <li><strong>📁 データ読込</strong>: CSV/Excelファイルをアップロード</li>
+        <li><strong>🎯 列の設定</strong>: 目的変数とSMILES列を選択</li>
+        <li><strong>⚗️ SMILES特徴量</strong>: 14エンジンで分子記述子を自動計算</li>
+        <li><strong>🚀 解析実行</strong>: モデル設定・学習・評価</li>
+        <li><strong>📊 結果</strong>: 予測精度・SHAP解釈・可視化</li>
+    </ol>
+</div>
+
+<div class="grid grid-2">
+    <div class="card">
+        <h3>🔬 対応エンジン</h3>
+        <table class="data-table" style="margin-top:1rem;">
+            <thead><tr><th>エンジン</th><th>記述子数</th><th>特徴</th></tr></thead>
+            <tbody>
+                <tr><td>RDKit</td><td>200+</td><td>標準的な分子記述子</td></tr>
+                <tr><td>Mordred</td><td>73</td><td>1800+から厳選</td></tr>
+                <tr><td>scikit-FP</td><td>10+ FP</td><td>ECFP, MACCS等</td></tr>
+                <tr><td>Mol2Vec</td><td>300</td><td>Word2Vec埋め込み</td></tr>
+                <tr><td>GroupContrib</td><td>9</td><td>Joback基団寄与法</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>🖥️ 3つのフロントエンド</h3>
+        <table class="data-table" style="margin-top:1rem;">
+            <thead><tr><th>版</th><th>起動コマンド</th></tr></thead>
+            <tbody>
+                <tr><td>Streamlit</td><td><code>streamlit run frontend_streamlit/app.py</code></td></tr>
+                <tr><td>Django</td><td><code>python frontend_django/manage.py runserver</code></td></tr>
+                <tr><td>NiceGUI</td><td><code>python frontend_nicegui/main.py</code></td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

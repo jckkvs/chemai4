@@ -1,0 +1,105 @@
+/* ==========================================
+   ChemAI2 グローバルフォントサイズ改善
+   ========================================== */
+
+/* 基本フォントサイズ 14px → 16px */
+body, .nicegui-content {
+    font-size: 16px !important;
+    font-family: "Inter", "Meiryo", "Hiragino Sans", "Yu Gothic", sans-serif !important;
+    line-height: 1.6;
+}
+
+/* 見出し */
+.text-h4 { font-size: 28px !important; font-weight: 700; }
+.text-h5 { font-size: 22px !important; font-weight: 600; }
+.text-h6 { font-size: 18px !important; font-weight: 600; }
+.text-subtitle1 { font-size: 16px !important; font-weight: 600; }
+.text-subtitle2 { font-size: 15px !important; font-weight: 600; }
+
+/* 本文・キャプション（下限保証） */
+.text-body1 { font-size: 15px !important; }
+.text-body2 { font-size: 14px !important; }
+.text-caption { font-size: 13px !important; }
+
+/* テーブル */
+.q-table {
+    font-size: 14px !important;
+}
+.q-table th {
+    font-size: 14px !important;
+    font-weight: 600;
+}
+.q-table td {
+    font-size: 14px !important;
+    padding: 8px 12px !important;
+}
+
+/* ボタン */
+.q-btn {
+    font-size: 14px !important;
+}
+.q-btn--size-md {
+    padding: 8px 18px !important;
+    min-height: 38px !important;
+}
+
+/* 入力フィールド */
+.q-field__label { font-size: 14px !important; }
+.q-field__native { font-size: 14px !important; }
+.q-field__input { font-size: 14px !important; }
+
+/* トグル・スイッチ・チェックボックス */
+.q-toggle__label,
+.q-checkbox__label,
+.q-radio__label {
+    font-size: 14px !important;
+}
+
+/* タブ */
+.q-tab__label { font-size: 14px !important; }
+
+/* バッジ */
+.q-badge { font-size: 12px !important; }
+
+/* ツールチップ */
+.q-tooltip { font-size: 13px !important; }
+
+/* セレクト・オプション */
+.q-select__dropdown-icon { font-size: 14px !important; }
+.q-item__label { font-size: 14px !important; }
+
+/* ==========================================
+   Plotly プロット内フォント（明示的改善）
+   CSS で直接変更は効果薄のため、
+   Python 側 ChartTheme.apply_to_plotly() で対応。
+   以下は補助的な適用。
+   ========================================== */
+
+/* Plotlyコンテナ基本フォント継承 */
+.js-plotly-plot {
+    font-family: "Inter", "Meiryo", sans-serif !important;
+}
+
+/* ==========================================
+   カード・レイアウト調整
+   ========================================== */
+
+.q-card {
+    border-radius: 12px !important;
+}
+
+/* ガラスカード（既存スタイルとの整合） */
+.glass-card .q-card__section {
+    font-size: 14px !important;
+}
+
+/* ==========================================
+   レスポンシブ調整
+   ========================================== */
+
+@media (max-width: 768px) {
+    body { font-size: 15px !important; }
+    .text-h5 { font-size: 20px !important; }
+    .text-h6 { font-size: 17px !important; }
+    .q-btn { font-size: 13px !important; }
+}

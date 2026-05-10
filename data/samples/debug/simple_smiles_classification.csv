@@ -1,0 +1,11 @@
+SMILES,Activity,MolecularWeight,LogP
+CCO,Active,46.07,-0.31
+CCCCO,Active,74.12,0.88
+c1ccccc1,Inactive,78.11,2.13
+CC(=O)O,Active,60.05,-0.17
+c1ccc(cc1)O,Inactive,94.11,1.46
+CC(C)O,Active,60.1,0.05
+CC1=CC2C(C(C1O)O)C2O,Active,166.18,0.48
+CC(C)CC1=CC(=C(C=C1)C(C)C(=O)O)C,Inactive,206.28,3.45
+CC1=CC(=CC=C1)S(=O)(=O)N,Inactive,171.21,0.62
+CCCCCCCCCO,Active,144.26,3.78

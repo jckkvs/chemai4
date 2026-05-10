@@ -1,0 +1,457 @@
+{% extends "base.html" %}
+
+{% block title %}📐 実験計画法 - ChemAI ML Studio{% endblock %}
+
+{% block content %}
+<h1 class="hero-title">📐 実験計画法（DoE）</h1>
+<p class="hero-subtitle">D最適・E最適・I最適計画 / 直交表 — 既存データの拡張にも対応</p>
+
+<!-- ─── モード選択 ─── -->
+<div class="card" style="margin-bottom:1.5rem;">
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="setDoeMode('scratch')" id="btn-mode-scratch">
+            🆕 ゼロから計画
+        </button>
+        <button class="btn btn-secondary" onclick="setDoeMode('augment')" id="btn-mode-augment">
+            📂 既存データを拡張
+        </button>
+    </div>
+    <p id="mode-help" style="color:var(--text-secondary);margin-top:0.8rem;font-size:0.85rem;">
+        因子（変数）を定義して、最適な実験計画を生成します。
+    </p>
+</div>
+
+<!-- ─── 既存データアップロード（augmentモード時のみ表示） ─── -->
+<div class="card" id="augment-upload" style="display:none;margin-bottom:1.5rem;">
+    <div class="card-header">
+        <span style="font-size:1.3rem">📂</span>
+        <h2 class="card-title">既存実験データの読込</h2>
+    </div>
+    <input type="file" id="existing-csv" accept=".csv,.xlsx,.xls"
+           style="margin-bottom:1rem;"
+           onchange="loadExistingData(this)">
+    <div id="existing-data-preview"></div>
+</div>
+
+<!-- ─── 因子設定 ─── -->
+<div class="card" style="margin-bottom:1.5rem;">
+    <div class="card-header">
+        <span style="font-size:1.3rem">⚙️</span>
+        <h2 class="card-title">因子設定</h2>
+        <span style="margin-left:auto;color:var(--text-muted);font-size:0.82rem;">
+            連続値・カテゴリの両方に対応
+        </span>
+    </div>
+
+    <div id="factors-list"></div>
+
+    <button class="btn btn-sm btn-secondary" onclick="addFactor('continuous')" style="margin-top:0.8rem;">
+        ＋ 連続値因子を追加
+    </button>
+    <button class="btn btn-sm btn-secondary" onclick="addFactor('categorical')" style="margin-top:0.8rem;margin-left:0.5rem;">
+        ＋ カテゴリ因子を追加
+    </button>
+</div>
+
+<!-- ─── 計画設定 ─── -->
+<div class="card" style="margin-bottom:1.5rem;">
+    <div class="card-header">
+        <span style="font-size:1.3rem">🎯</span>
+        <h2 class="card-title">計画設定</h2>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;">
+        <!-- 基準選択 -->
+        <div>
+            <label class="form-label">最適化基準</label>
+            <select id="doe-criterion" class="form-control">
+                <option value="D" selected>D最適（情報行列の行列式 最大化）</option>
+                <option value="E">E最適（最小固有値 最大化）</option>
+                <option value="I">I最適（予測分散 最小化）</option>
+                <option value="orthogonal">直交表</option>
+            </select>
+        </div>
+        <!-- 新規点数 -->
+        <div>
+            <label class="form-label">追加する実験数</label>
+            <input type="number" id="doe-n-new" class="form-control" value="10" min="1" max="500">
+        </div>
+        <!-- マルチスタート -->
+        <div>
+            <label class="form-label">マルチスタート数</label>
+            <input type="number" id="doe-n-starts" class="form-control" value="5" min="1" max="50">
+        </div>
+        <!-- 最大候補数 -->
+        <div>
+            <label class="form-label">最大候補数
+                <span style="font-size:0.72rem;color:var(--text-muted);">(計算爆発防止)</span>
+            </label>
+            <input type="number" id="doe-max-candidates" class="form-control" value="5000" min="100" max="100000">
+        </div>
+    </div>
+
+    <div id="orthogonal-options" style="display:none;margin-top:1rem;">
+        <label class="form-label">直交表の種類</label>
+        <select id="doe-oa-type" class="form-control" style="max-width:300px;">
+            <option value="L4">L4 (2因子2水準)</option>
+            <option value="L8">L8 (7因子2水準)</option>
+            <option value="L9">L9 (4因子3水準)</option>
+            <option value="L16">L16 (15因子2水準)</option>
+            <option value="L18">L18 (8因子3水準)</option>
+            <option value="L27">L27 (13因子3水準)</option>
+        </select>
+    </div>
+</div>
+
+<!-- ─── 実行 ─── -->
+<div style="display:flex;gap:1rem;margin-bottom:1.5rem;">
+    <button class="btn btn-primary btn-lg" id="btn-run-doe" onclick="runDoE()" style="min-width:220px;">
+        🧪 計画を生成
+    </button>
+</div>
+
+<!-- ─── 結果 ─── -->
+<div id="doe-results" style="display:none;">
+    <div class="card" style="margin-bottom:1.5rem;">
+        <div class="card-header">
+            <span style="font-size:1.3rem">📊</span>
+            <h2 class="card-title">実験計画結果</h2>
+        </div>
+        <div id="doe-summary" style="margin-bottom:1rem;"></div>
+        <div id="doe-table-container" style="overflow-x:auto;"></div>
+        <div style="margin-top:1rem;display:flex;gap:0.8rem;">
+            <button class="btn btn-secondary" onclick="downloadDoeCSV()">📥 CSV ダウンロード</button>
+        </div>
+    </div>
+</div>
+
+<!-- ─── ローディング ─── -->
+<div id="doe-loading" style="display:none;">
+    <div class="card" style="text-align:center;padding:2rem;">
+        <div class="spinner" style="margin:0 auto 1rem;width:48px;height:48px;border:4px solid rgba(0,188,212,0.2);
+                    border-top-color:#00bcd4;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+        <p id="doe-loading-msg" style="color:var(--text-secondary);">計算中...</p>
+    </div>
+</div>
+
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+.factor-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 0.8rem;
+    position: relative;
+}
+.factor-card .factor-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.8rem;
+}
+.factor-card .factor-badge {
+    font-size: 0.72rem;
+    padding: 2px 8px;
+    border-radius: 8px;
+    font-weight: 600;
+}
+.factor-badge.continuous { background: rgba(0,188,212,0.2); color: #00e5ff; }
+.factor-badge.categorical { background: rgba(255,152,0,0.2); color: #ffab40; }
+.factor-card .remove-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(255,82,82,0.2);
+    color: #ff5252;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    line-height: 1;
+}
+.factor-card .remove-btn:hover { background: rgba(255,82,82,0.4); }
+.factor-row-new { background: rgba(0,188,212,0.05) !important; }
+.factor-row-existing { background: rgba(255,255,255,0.02) !important; }
+</style>
+
+<script>
+/* ────── 状態管理 ────── */
+let doeMode = 'scratch';
+let factorCounter = 0;
+let existingDf = null;  // 既存データ（augmentモード）
+let lastDoeResult = null;
+
+function setDoeMode(mode) {
+    doeMode = mode;
+    document.getElementById('btn-mode-scratch').className = mode === 'scratch' ? 'btn btn-primary' : 'btn btn-secondary';
+    document.getElementById('btn-mode-augment').className = mode === 'augment' ? 'btn btn-primary' : 'btn btn-secondary';
+    document.getElementById('augment-upload').style.display = mode === 'augment' ? 'block' : 'none';
+    document.getElementById('mode-help').textContent = mode === 'scratch'
+        ? '因子（変数）を定義して、最適な実験計画を生成します。'
+        : '既存の実験データをCSVでアップロードし、そのデータを固定して追加実験を最適設計します。';
+}
+
+/* ────── 因子管理 ────── */
+function addFactor(type, name = '', low = 0, high = 1, nLevels = 5, categories = '') {
+    factorCounter++;
+    const id = `factor-${factorCounter}`;
+    const badgeClass = type === 'continuous' ? 'continuous' : 'categorical';
+    const badgeText = type === 'continuous' ? '連続値' : 'カテゴリ';
+
+    let fieldsHtml;
+    if (type === 'continuous') {
+        fieldsHtml = `
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.6rem;">
+                <div>
+                    <label class="form-label" style="font-size:0.75rem;">下限</label>
+                    <input type="number" class="form-control" data-field="low" value="${low}" step="any">
+                </div>
+                <div>
+                    <label class="form-label" style="font-size:0.75rem;">上限</label>
+                    <input type="number" class="form-control" data-field="high" value="${high}" step="any">
+                </div>
+                <div>
+                    <label class="form-label" style="font-size:0.75rem;">水準数</label>
+                    <input type="number" class="form-control" data-field="n_levels" value="${nLevels}" min="2" max="100">
+                </div>
+            </div>`;
+    } else {
+        fieldsHtml = `
+            <div>
+                <label class="form-label" style="font-size:0.75rem;">カテゴリ値（カンマ区切り）</label>
+                <input type="text" class="form-control" data-field="categories" value="${categories}"
+                       placeholder="例: A, B, C">
+            </div>`;
+    }
+
+    const html = `
+        <div class="factor-card" id="${id}" data-type="${type}">
+            <button class="remove-btn" onclick="document.getElementById('${id}').remove()">✕</button>
+            <div class="factor-header">
+                <span class="factor-badge ${badgeClass}">${badgeText}</span>
+                <input type="text" class="form-control" data-field="name" value="${name}"
+                       placeholder="因子名（例: 温度）" style="max-width:200px;font-weight:600;">
+            </div>
+            ${fieldsHtml}
+        </div>`;
+    document.getElementById('factors-list').insertAdjacentHTML('beforeend', html);
+}
+
+function collectFactors() {
+    const cards = document.querySelectorAll('.factor-card');
+    const factors = [];
+    for (const card of cards) {
+        const type = card.dataset.type;
+        const name = card.querySelector('[data-field="name"]').value.trim();
+        if (!name) continue;
+        if (type === 'continuous') {
+            factors.push({
+                name,
+                type: 'continuous',
+                low: parseFloat(card.querySelector('[data-field="low"]').value) || 0,
+                high: parseFloat(card.querySelector('[data-field="high"]').value) || 1,
+                n_levels: parseInt(card.querySelector('[data-field="n_levels"]').value) || 5,
+            });
+        } else {
+            const cats = card.querySelector('[data-field="categories"]').value
+                .split(',').map(s => s.trim()).filter(Boolean);
+            factors.push({ name, type: 'categorical', categories: cats });
+        }
+    }
+    return factors;
+}
+
+/* ────── 既存データ読込 ────── */
+async function loadExistingData(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const preview = document.getElementById('existing-data-preview');
+    preview.innerHTML = '<p style="color:var(--text-muted);">読み込み中...</p>';
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const resp = await fetch('/api/doe/upload_existing/', { method: 'POST', body: formData });
+        const data = await resp.json();
+        if (data.error) throw new Error(data.error);
+
+        existingDf = data;
+
+        // プレビュー
+        let html = `<p style="color:var(--text-secondary);font-size:0.85rem;">
+            ✅ ${data.n_rows}行 × ${data.n_cols}列 読み込み完了</p>`;
+
+        // 列情報から因子を自動生成
+        html += `<button class="btn btn-sm btn-primary" onclick="autoFactorsFromExisting()" style="margin-top:0.5rem;">
+            🔄 列から因子を自動設定</button>`;
+
+        // データプレビュー（先頭5行）
+        if (data.preview) {
+            html += '<div style="overflow-x:auto;margin-top:0.8rem;">';
+            html += '<table class="data-table" style="font-size:0.78rem;"><thead><tr>';
+            for (const col of data.columns) html += `<th>${col}</th>`;
+            html += '</tr></thead><tbody>';
+            for (const row of data.preview.slice(0, 5)) {
+                html += '<tr>';
+                for (const col of data.columns) html += `<td>${row[col] ?? '—'}</td>`;
+                html += '</tr>';
+            }
+            html += '</tbody></table></div>';
+        }
+        preview.innerHTML = html;
+    } catch (err) {
+        preview.innerHTML = `<p style="color:#ff5252;">❌ ${err.message}</p>`;
+    }
+}
+
+function autoFactorsFromExisting() {
+    if (!existingDf) return;
+    document.getElementById('factors-list').innerHTML = '';
+    factorCounter = 0;
+
+    for (const col of existingDf.column_info) {
+        if (col.dtype === 'numeric') {
+            addFactor('continuous', col.name, col.min, col.max, 5);
+        } else {
+            addFactor('categorical', col.name, 0, 1, 5, col.categories.join(', '));
+        }
+    }
+}
+
+/* ────── 基準選択でUI切替 ────── */
+document.addEventListener('DOMContentLoaded', () => {
+    const sel = document.getElementById('doe-criterion');
+    sel.addEventListener('change', () => {
+        const isOA = sel.value === 'orthogonal';
+        document.getElementById('orthogonal-options').style.display = isOA ? 'block' : 'none';
+        document.getElementById('doe-n-new').closest('div').style.display = isOA ? 'none' : '';
+        document.getElementById('doe-n-starts').closest('div').style.display = isOA ? 'none' : '';
+    });
+    // 初期因子2つ
+    addFactor('continuous', '', 0, 100, 5);
+    addFactor('continuous', '', 0, 100, 5);
+});
+
+/* ────── DoE実行 ────── */
+async function runDoE() {
+    const factors = collectFactors();
+    if (factors.length === 0) {
+        alert('因子を1つ以上設定してください。');
+        return;
+    }
+
+    const criterion = document.getElementById('doe-criterion').value;
+    const payload = {
+        factors,
+        criterion,
+        n_new: parseInt(document.getElementById('doe-n-new').value) || 10,
+        n_starts: parseInt(document.getElementById('doe-n-starts').value) || 5,
+        max_candidates: parseInt(document.getElementById('doe-max-candidates').value) || 5000,
+        mode: doeMode,
+    };
+    if (criterion === 'orthogonal') {
+        payload.oa_type = document.getElementById('doe-oa-type').value;
+    }
+    if (doeMode === 'augment' && existingDf) {
+        payload.existing_session_key = existingDf.session_key;
+    }
+
+    document.getElementById('doe-loading').style.display = 'block';
+    document.getElementById('doe-results').style.display = 'none';
+    document.getElementById('btn-run-doe').disabled = true;
+
+    try {
+        const resp = await fetch('/api/doe/run/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        const data = await resp.json();
+        if (data.error) throw new Error(data.error);
+
+        lastDoeResult = data;
+        renderDoeResults(data);
+    } catch (err) {
+        document.getElementById('doe-results').style.display = 'block';
+        document.getElementById('doe-summary').innerHTML =
+            `<div class="alert alert-error">❌ エラー: ${err.message}</div>`;
+    } finally {
+        document.getElementById('doe-loading').style.display = 'none';
+        document.getElementById('btn-run-doe').disabled = false;
+    }
+}
+
+/* ────── 結果描画 ────── */
+function renderDoeResults(data) {
+    const container = document.getElementById('doe-results');
+    container.style.display = 'block';
+
+    // サマリー
+    const sum = document.getElementById('doe-summary');
+    sum.innerHTML = `
+        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+            <div class="metric-card-mini">
+                <div class="metric-value-sm">${data.criterion_name}</div>
+                <div class="metric-label-sm">基準</div>
+            </div>
+            <div class="metric-card-mini">
+                <div class="metric-value-sm">${data.criterion_value}</div>
+                <div class="metric-label-sm">基準値</div>
+            </div>
+            <div class="metric-card-mini">
+                <div class="metric-value-sm">${(data.d_efficiency * 100).toFixed(1)}%</div>
+                <div class="metric-label-sm">D効率</div>
+            </div>
+            <div class="metric-card-mini">
+                <div class="metric-value-sm">${data.n_existing}</div>
+                <div class="metric-label-sm">既存点</div>
+            </div>
+            <div class="metric-card-mini">
+                <div class="metric-value-sm">${data.n_new}</div>
+                <div class="metric-label-sm">新規点</div>
+            </div>
+        </div>`;
+
+    // テーブル
+    const tc = document.getElementById('doe-table-container');
+    const cols = data.columns;
+    let html = '<table class="data-table" style="font-size:0.82rem;"><thead><tr>';
+    html += '<th>#</th><th>区分</th>';
+    for (const c of cols) html += `<th>${c}</th>`;
+    html += '</tr></thead><tbody>';
+    for (let i = 0; i < data.rows.length; i++) {
+        const row = data.rows[i];
+        const isNew = data.is_new[i];
+        const cls = isNew ? 'factor-row-new' : 'factor-row-existing';
+        const label = isNew
+            ? '<span style="color:#00e5ff;font-size:0.75rem;font-weight:600;">🆕 新規</span>'
+            : '<span style="color:var(--text-muted);font-size:0.75rem;">📌 既存</span>';
+        html += `<tr class="${cls}"><td>${i + 1}</td><td>${label}</td>`;
+        for (const c of cols) html += `<td>${row[c] ?? '—'}</td>`;
+        html += '</tr>';
+    }
+    html += '</tbody></table>';
+    tc.innerHTML = html;
+}
+
+/* ────── CSV DL ────── */
+function downloadDoeCSV() {
+    if (!lastDoeResult) return;
+    const cols = lastDoeResult.columns;
+    const rows = lastDoeResult.rows;
+    let csv = cols.join(',') + '\n';
+    for (const row of rows) {
+        csv += cols.map(c => row[c] ?? '').join(',') + '\n';
+    }
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `doe_plan_${lastDoeResult.criterion_name}.csv`;
+    a.click();
+}
+</script>
+{% endblock %}

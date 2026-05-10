@@ -1,0 +1,1485 @@
+{% extends "base.html" %}
+
+{% block title %}{{ session.name }} - ChemAI ML Studio{% endblock %}
+
+{% block content %}
+<div data-session-id="{{ session.id }}">
+
+<!-- ステップインジケーター -->
+<div style="display:flex;gap:0.5rem;margin-bottom:2rem;overflow-x:auto;">
+    {% with steps="data:📁 データ読込,columns:🎯 列の設定,smiles:⚗️ SMILES特徴量,analysis:🚀 解析実行,results:📊 結果" %}
+    {% for s in steps|cut:" "|make_list %}
+    {% endfor %}
+    {% endwith %}
+    <a href="?step=data" class="btn btn-sm {% if step == 'data' %}btn-primary{% else %}btn-secondary{% endif %}">
+        📁 データ読込
+    </a>
+    <a href="?step=columns" class="btn btn-sm {% if step == 'columns' %}btn-primary{% else %}btn-secondary{% endif %}">
+        🎯 列の設定
+    </a>
+    <a href="?step=smiles" class="btn btn-sm {% if step == 'smiles' %}btn-primary{% else %}btn-secondary{% endif %}">
+        ⚗️ SMILES特徴量
+    </a>
+    <a href="?step=analysis" class="btn btn-sm {% if step == 'analysis' %}btn-primary{% else %}btn-secondary{% endif %}">
+        🚀 解析実行
+    </a>
+    <a href="?step=results" class="btn btn-sm {% if step == 'results' %}btn-primary{% else %}btn-secondary{% endif %}">
+        📊 結果
+    </a>
+</div>
+
+{% if step == 'data' %}
+<!-- ════════════════════════════════════════════ -->
+<!-- データ読込ステップ                           -->
+<!-- ════════════════════════════════════════════ -->
+<h2 style="margin-bottom:1.5rem;">📁 データ読込</h2>
+
+{% if session.status == 'created' %}
+<div class="card">
+    <div class="dropzone" id="dropzone">
+        <input type="file" accept=".csv,.xlsx,.xls" style="display:none">
+        <div class="dropzone-icon">📂</div>
+        <div class="dropzone-text">
+            CSV / Excel ファイルをドラッグ&ドロップ<br>
+            またはクリックして選択
+        </div>
+    </div>
+    <div id="upload-status" style="display:none;margin-top:1rem;"></div>
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom: 1rem;">🧪 サンプルデータで試す</h3>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+        <button class="btn btn-secondary"
+                onclick="loadSample('{{ session.id }}', 'regression', true)">
+            🧪 回帰サンプル（SMILES付き）
+        </button>
+        <button class="btn btn-secondary"
+                onclick="loadSample('{{ session.id }}', 'regression', false)">
+            📊 回帰サンプル（数値のみ）
+        </button>
+        <button class="btn btn-secondary"
+                onclick="loadSample('{{ session.id }}', 'classification', false)">
+            🏷️ 分類サンプル
+        </button>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-success">
+    ✅ {{ session.original_filename }} を読み込み済み（{{ session.n_rows }}行 × {{ session.n_cols }}列）
+</div>
+<div class="card">
+    <div id="data-preview">データプレビューはここに表示されます</div>
+</div>
+<a href="?step=columns" class="btn btn-primary">次へ: 列の設定 →</a>
+{% endif %}
+
+{% elif step == 'columns' %}
+<!-- ════════════════════════════════════════════ -->
+<!-- 列の設定ステップ                             -->
+<!-- ════════════════════════════════════════════ -->
+<h2 style="margin-bottom:1.5rem;">🎯 列の設定</h2>
+
+{% if session.status == 'created' %}
+<div class="alert alert-warning">⚠️ まずデータを読み込んでください。</div>
+<a href="?step=data" class="btn btn-secondary">← データ読込に戻る</a>
+{% else %}
+<div class="card">
+    <div class="grid grid-2">
+        <div class="form-group">
+            <label class="form-label">目的変数</label>
+            <select class="form-select" id="target-col">
+                <option value="">選択してください</option>
+                <!-- JS で動的に追加 -->
+            </select>
+        </div>
+        <div class="form-group">
+            <label class="form-label">SMILES列（任意）</label>
+            <select class="form-select" id="smiles-col">
+                <option value="">なし</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="form-label">タスクタイプ</label>
+        <select class="form-select" id="task-type">
+            <option value="regression" {% if session.task_type == 'regression' %}selected{% endif %}>回帰</option>
+            <option value="classification" {% if session.task_type == 'classification' %}selected{% endif %}>分類</option>
+        </select>
+    </div>
+    <button class="btn btn-primary" onclick="setColumns('{{ session.id }}')">
+        ✅ 設定を保存
+    </button>
+</div>
+{% endif %}
+
+{% elif step == 'smiles' %}
+<!-- ════════════════════════════════════════════ -->
+<!-- SMILES特徴量ステップ                         -->
+<!-- ════════════════════════════════════════════ -->
+<h2 style="margin-bottom:1.5rem;">⚗️ SMILES特徴量設計</h2>
+
+{% if not session.smiles_col %}
+<div class="alert alert-info">💡 SMILES列が設定されていません。「列の設定」でSMILES列を選択してください。</div>
+<a href="?step=columns" class="btn btn-secondary">← 列の設定に戻る</a>
+{% else %}
+
+<!-- プリセット解析目標 -->
+<div class="card">
+    <div class="card-header">
+        <span style="font-size:1.3rem">🎯</span>
+        <h3 class="card-title">解析目標プリセット（任意）</h3>
+    </div>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1rem;" id="preset-btns">
+        <button class="btn btn-secondary btn-sm" onclick="selectPreset('solubility')">💧 溶解度予測</button>
+        <button class="btn btn-secondary btn-sm" onclick="selectPreset('activity')">🎯 活性予測(QSAR)</button>
+        <button class="btn btn-secondary btn-sm" onclick="selectPreset('toxicity')">⚠️ 毒性予測</button>
+        <button class="btn btn-secondary btn-sm" onclick="selectPreset('all')">🔬 全記述子</button>
+    </div>
+    <p id="preset-info" style="font-size:0.8rem;color:var(--text-muted);margin:0;">プリセットを選ぶと推奨エンジンが自動選択されます</p>
+</div>
+
+<!-- エンジン選択 -->
+<div class="card">
+    <div class="card-header">
+        <span style="font-size:1.3rem">🧬</span>
+        <h3 class="card-title">記述子エンジン</h3>
+    </div>
+    <div class="grid grid-2" id="engine-grid">
+        <label class="checkbox-label engine-card" data-engine="rdkit">
+            <input type="checkbox" checked data-engine="rdkit">
+            <div>
+                <strong>RDKit</strong> <span class="engine-badge available">✅ 利用可</span><br>
+                <span style="font-size:0.75rem;color:var(--text-muted);">200+記述子 — 物理化学的性質</span>
+            </div>
+        </label>
+        <label class="checkbox-label engine-card" data-engine="mordred">
+            <input type="checkbox" checked data-engine="mordred">
+            <div>
+                <strong>Mordred</strong> <span class="engine-badge available">✅ 利用可</span><br>
+                <span style="font-size:0.75rem;color:var(--text-muted);">1800+記述子 — 包括的</span>
+            </div>
+        </label>
+        <label class="checkbox-label engine-card" data-engine="skfp">
+            <input type="checkbox" checked data-engine="skfp">
+            <div>
+                <strong>scikit-fingerprints</strong> <span class="engine-badge available">✅ 利用可</span><br>
+                <span style="font-size:0.75rem;color:var(--text-muted);">分子フィンガープリント</span>
+            </div>
+        </label>
+        <label class="checkbox-label engine-card" data-engine="molai">
+            <input type="checkbox" data-engine="molai">
+            <div>
+                <strong>MolAI</strong> <span class="engine-badge">🧠 Deep Learning</span><br>
+                <span style="font-size:0.75rem;color:var(--text-muted);">Mol2Vec/ChemBERTa</span>
+            </div>
+        </label>
+        <label class="checkbox-label engine-card" data-engine="xtb">
+            <input type="checkbox" data-engine="xtb">
+            <div>
+                <strong>xTB</strong> <span class="engine-badge">⚛️ 量子化学</span><br>
+                <span style="font-size:0.75rem;color:var(--text-muted);">電子状態・エネルギー</span>
+            </div>
+        </label>
+        <label class="checkbox-label engine-card" data-engine="group_contrib">
+            <input type="checkbox" checked data-engine="group_contrib">
+            <div>
+                <strong>Group Contribution</strong> <span class="engine-badge available">✅ 利用可</span><br>
+                <span style="font-size:0.75rem;color:var(--text-muted);">官能基ベース記述子</span>
+            </div>
+        </label>
+    </div>
+</div>
+
+<!-- 計算実行 -->
+<div class="card">
+    <button class="btn btn-primary btn-lg" id="btn-calc-desc"
+            onclick="calculateDescriptors('{{ session.id }}')">
+        ⚗️ 選択エンジンで記述子を計算
+    </button>
+    <div id="desc-progress" style="display:none;margin-top:1rem;">
+        <div class="progress-bar"><div class="progress-fill" id="desc-progress-fill" style="width:0%"></div></div>
+        <p id="desc-progress-text" style="margin-top:0.5rem;font-size:0.85rem;color:var(--text-secondary);"></p>
+    </div>
+    <div id="desc-results" style="margin-top:1rem;"></div>
+</div>
+
+{% if session.status == 'descriptors_calculated' %}
+<div class="alert alert-success">✅ 記述子計算済み</div>
+<a href="?step=analysis" class="btn btn-primary">次へ: 解析実行 →</a>
+{% endif %}
+{% endif %}
+
+{% elif step == 'analysis' %}
+<!-- ════════════════════════════════════════════ -->
+<!-- 解析実行ステップ                             -->
+<!-- ════════════════════════════════════════════ -->
+<h2 style="margin-bottom:1.5rem;">🚀 解析実行</h2>
+
+{% if session.status == 'created' %}
+<div class="alert alert-warning">⚠️ まずデータを読み込んでください。</div>
+<a href="?step=data" class="btn btn-secondary">← データ読込に戻る</a>
+{% elif not session.target_col %}
+<div class="alert alert-warning">⚠️ 目的変数が設定されていません。</div>
+<a href="?step=columns" class="btn btn-secondary">← 列の設定に戻る</a>
+{% else %}
+<div class="card">
+    <div class="card-header">
+        <span style="font-size:1.3rem">⚙️</span>
+        <h3 class="card-title">AutoML 設定</h3>
+    </div>
+    <div class="grid grid-2" style="margin-bottom:1rem;">
+        <div class="form-group">
+            <label class="form-label">目的変数</label>
+            <div class="form-static">{{ session.target_col }} ({{ session.task_type }})</div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">CV 分割数</label>
+            <select class="form-select" id="cv-folds">
+                <option value="3">3-Fold</option>
+                <option value="5" selected>5-Fold（推奨）</option>
+                <option value="10">10-Fold</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="form-label">データ概要</label>
+        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+            <div class="metric-card-mini">
+                <div class="metric-value-sm">{{ session.n_rows }}</div>
+                <div class="metric-label-sm">サンプル数</div>
+            </div>
+            <div class="metric-card-mini">
+                <div class="metric-value-sm">{{ session.n_cols }}</div>
+                <div class="metric-label-sm">列数</div>
+            </div>
+            <div class="metric-card-mini">
+                <div class="metric-value-sm">{{ session.task_type }}</div>
+                <div class="metric-label-sm">タスク</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════ マルチセット解析 ═══════════════════ -->
+<div class="card" style="margin-top:1rem;border:1px solid rgba(0,229,255,0.2);">
+    <div class="card-header" style="background:linear-gradient(90deg,rgba(0,60,120,0.4),rgba(0,30,60,0.2));">
+        <span style="font-size:1.3rem">🧩</span>
+        <h3 class="card-title">特徴量セット × パイプライン 設定</h3>
+        <span style="font-size:0.75rem;color:var(--text-secondary);margin-left:auto;">
+            高次元セットにはSparse Random Projection（JL補題）が自動適用されます
+        </span>
+    </div>
+
+    <!-- JL補題の説明 -->
+    <div style="background:rgba(0,40,80,0.3);border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;font-size:0.82rem;color:var(--text-secondary);border-left:3px solid rgba(0,229,255,0.4);">
+        💡 <strong>特殊パイプライン（JL-RP）とは：</strong>
+        説明変数が <em>n_features &gt; johnson_lindenstrauss_min_dim(n_samples, ε)</em> を満たす場合のみ
+        <strong>SparseRandomProjection</strong> で次元削減を行います。条件を満たさない場合はPassthrough（削減なし）になります。
+    </div>
+
+    <!-- セットリスト -->
+    <div id="feature-set-list" style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;"></div>
+
+    <!-- 新規セット追加ボタン -->
+    <button class="btn btn-secondary btn-sm" onclick="addFeatureSet()">
+        ＋ 特徴量セットを追加
+    </button>
+</div>
+
+<!-- 実行ボタン群 -->
+<div class="card" style="margin-top:1rem;">
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+        <button class="btn btn-primary btn-lg" id="btn-run-multi"
+                onclick="runMultiAnalysis('{{ session.id }}')">
+            🧩 マルチセット解析を開始
+        </button>
+        <span style="color:var(--text-muted);font-size:0.85rem;">または</span>
+        <button class="btn btn-secondary" id="btn-run-analysis"
+                onclick="runAnalysis('{{ session.id }}')">
+            🚀 通常 AutoML（全列・単一セット）
+        </button>
+    </div>
+    <div id="analysis-progress" style="display:none;margin-top:1rem;">
+        <div class="progress-bar"><div class="progress-fill" id="analysis-progress-fill" style="width:0%"></div></div>
+        <p id="analysis-progress-text" style="margin-top:0.5rem;font-size:0.85rem;color:var(--text-secondary);"></p>
+    </div>
+    <div id="analysis-result-summary" style="margin-top:1rem;"></div>
+</div>
+
+<!-- マルチ解析 結果プレビュー（解析完了後インラインで表示） -->
+<div id="multi-result-preview" style="display:none;margin-top:1.5rem;"></div>
+{% endif %}
+
+{% elif step == 'results' %}
+<!-- ════════════════════════════════════════════ -->
+<!-- 結果表示ステップ                             -->
+<!-- ════════════════════════════════════════════ -->
+<h2 style="margin-bottom:1.5rem;">📊 結果</h2>
+
+{% if session.status == 'completed' %}
+<div class="card" id="results-container">
+    <div class="card-header">
+        <span style="font-size:1.3rem">🏆</span>
+        <h3 class="card-title">解析結果</h3>
+    </div>
+    <div id="results-content">読み込み中...</div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => loadResults('{{ session.id }}'));
+</script>
+
+<!-- ─── 高度な解析ツール（タブ切替） ─── -->
+<div style="margin-top:2rem;">
+<h2 style="margin-bottom:1rem;">🔬 高度な解析ツール</h2>
+<div style="display:flex;gap:0.5rem;margin-bottom:1rem;flex-wrap:wrap;">
+    <button class="btn btn-sm btn-secondary" onclick="showAdvTab('inverse')" id="adv-tab-inverse">🔄 逆解析</button>
+    <button class="btn btn-sm btn-secondary" onclick="showAdvTab('bayesian')" id="adv-tab-bayesian">🧠 ベイズ最適化</button>
+    <button class="btn btn-sm btn-secondary" onclick="showAdvTab('doe')" id="adv-tab-doe">📐 実験計画法</button>
+    <button class="btn btn-sm btn-secondary" onclick="showAdvTab('leakage')" id="adv-tab-leakage">🛡️ リーケージ検出</button>
+</div>
+
+<!-- ─── 逆解析パネル ─── -->
+<div id="adv-panel-inverse" class="card" style="display:none;">
+    <div class="card-header">
+        <span style="font-size:1.3rem">🔄</span>
+        <h3 class="card-title">逆解析 — 目標値からの入力探索</h3>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:1rem;">
+        <div>
+            <label class="form-label">目標モード</label>
+            <select id="inv-target-mode" class="form-control" onchange="toggleInvRange()">
+                <option value="maximize">最大化</option>
+                <option value="minimize">最小化</option>
+                <option value="range">範囲指定</option>
+            </select>
+        </div>
+        <div id="inv-range-min-wrap" style="display:none;">
+            <label class="form-label">目標下限</label>
+            <input type="number" id="inv-target-min" class="form-control" step="any">
+        </div>
+        <div id="inv-range-max-wrap" style="display:none;">
+            <label class="form-label">目標上限</label>
+            <input type="number" id="inv-target-max" class="form-control" step="any">
+        </div>
+        <div>
+            <label class="form-label">最適化手法</label>
+            <select id="inv-method" class="form-control">
+                <option value="random">ランダムサンプリング</option>
+                <option value="grid">グリッドサーチ</option>
+                <option value="bayesian">ベイズ最適化</option>
+                <option value="ga">遺伝的アルゴリズム</option>
+            </select>
+        </div>
+    </div>
+    <details style="margin-bottom:1rem;">
+        <summary style="cursor:pointer;color:var(--text-secondary);font-size:0.87rem;">⚙️ 変数制約設定（クリックで展開）</summary>
+        <div id="inv-constraints-table" style="margin-top:0.8rem;overflow-x:auto;">
+            <p style="color:var(--text-muted);font-size:0.82rem;">順解析の結果から自動設定されます</p>
+        </div>
+    </details>
+    <button class="btn btn-primary" onclick="runInverse('{{ session.id }}')" id="btn-run-inv">🔄 逆解析を実行</button>
+    <div id="inv-loading" style="display:none;margin-top:1rem;">
+        <div class="spinner" style="width:32px;height:32px;border:3px solid rgba(0,188,212,0.2);
+                    border-top-color:#00bcd4;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;vertical-align:middle;"></div>
+        <span style="color:var(--text-secondary);margin-left:0.5rem;">計算中...</span>
+    </div>
+    <div id="inv-results" style="margin-top:1rem;"></div>
+</div>
+
+<!-- ─── ベイズ最適化パネル ─── -->
+<div id="adv-panel-bayesian" class="card" style="display:none;">
+    <div class="card-header">
+        <span style="font-size:1.3rem">🧠</span>
+        <h3 class="card-title">ベイズ最適化 — 次の実験候補提案</h3>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1rem;">
+        <div>
+            <label class="form-label">目的</label>
+            <select id="bo-objective" class="form-control">
+                <option value="minimize">最小化</option>
+                <option value="maximize">最大化</option>
+            </select>
+        </div>
+        <div>
+            <label class="form-label">獲得関数</label>
+            <select id="bo-acquisition" class="form-control">
+                <option value="ei" selected>EI（Expected Improvement）</option>
+                <option value="pi">PI（Probability of Improvement）</option>
+                <option value="ucb">UCB（Upper Confidence Bound）</option>
+            </select>
+        </div>
+        <div>
+            <label class="form-label">カーネル</label>
+            <select id="bo-kernel" class="form-control">
+                <option value="default" selected>DotProduct + Matern + White</option>
+                <option value="matern">Matern + White</option>
+                <option value="dotproduct">DotProduct + White</option>
+            </select>
+        </div>
+        <div>
+            <label class="form-label">バッチ戦略</label>
+            <select id="bo-batch" class="form-control">
+                <option value="kriging_believer" selected>Kriging Believer</option>
+                <option value="doe_then_bo">DoE → BO</option>
+                <option value="bo_then_doe">BO → DoE</option>
+                <option value="single">単純 Top-N</option>
+            </select>
+        </div>
+        <div>
+            <label class="form-label">候補数</label>
+            <input type="number" id="bo-n-candidates" class="form-control" value="5" min="1" max="50">
+        </div>
+    </div>
+    <button class="btn btn-primary" onclick="runBO('{{ session.id }}')" id="btn-run-bo">🧠 候補を提案</button>
+    <div id="bo-loading" style="display:none;margin-top:1rem;">
+        <div class="spinner" style="width:32px;height:32px;border:3px solid rgba(0,188,212,0.2);
+                    border-top-color:#00bcd4;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;vertical-align:middle;"></div>
+        <span style="color:var(--text-secondary);margin-left:0.5rem;">GP学習＋候補探索中...</span>
+    </div>
+    <div id="bo-results" style="margin-top:1rem;"></div>
+    <div id="bo-pca" style="margin-top:1rem;"></div>
+</div>
+
+<!-- ─── リーケージ検出パネル ─── -->
+<div id="adv-panel-leakage" class="card" style="display:none;">
+    <div class="card-header">
+        <span style="font-size:1.3rem">🛡️</span>
+        <h3 class="card-title">リーケージ検出 — データ品質チェック</h3>
+    </div>
+    <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:1rem;">
+        サンプル間類似度（ハット行列 / RBF / RF Proximity）を評価し、リーケージリスクとCV推奨を報告します。
+    </p>
+    <button class="btn btn-primary" onclick="runLeakageCheck('{{ session.id }}')" id="btn-run-leak">🛡️ チェック実行</button>
+    <div id="leak-loading" style="display:none;margin-top:1rem;">
+        <div class="spinner" style="width:32px;height:32px;border:3px solid rgba(0,188,212,0.2);
+                    border-top-color:#00bcd4;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;vertical-align:middle;"></div>
+        <span style="color:var(--text-secondary);margin-left:0.5rem;">類似度計算中...</span>
+    </div>
+    <div id="leak-results" style="margin-top:1rem;"></div>
+</div>
+
+<!-- ─── 実験計画法（DoE）パネル ─── -->
+<div id="adv-panel-doe" class="card" style="display:none;">
+    <div class="card-header">
+        <span style="font-size:1.3rem">📐</span>
+        <h3 class="card-title">実験計画法 — 追加実験の最適設計</h3>
+    </div>
+    <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:1rem;">
+        現在のデータを固定し、D/E/I最適基準で追加実験を設計します。ゼロからの新規計画も可能です。
+    </p>
+
+    <!-- モード切替 -->
+    <div style="display:flex;gap:0.8rem;margin-bottom:1rem;">
+        <button class="btn btn-sm btn-primary" onclick="setDoeSessionMode('augment')" id="doe-s-mode-augment">📂 既存データを拡張</button>
+        <button class="btn btn-sm btn-secondary" onclick="setDoeSessionMode('scratch')" id="doe-s-mode-scratch">🆕 ゼロから計画</button>
+    </div>
+
+    <!-- 因子設定 -->
+    <div style="border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:1rem;margin-bottom:1rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;">
+            <h4 style="margin:0;">⚙️ 因子設定</h4>
+            <div>
+                <button class="btn btn-sm btn-secondary" onclick="autoDetectFactors('{{ session.id }}')">🔄 データから自動検出</button>
+                <button class="btn btn-sm btn-secondary" onclick="addSessionFactor('continuous')" style="margin-left:0.3rem;">＋ 連続</button>
+                <button class="btn btn-sm btn-secondary" onclick="addSessionFactor('categorical')" style="margin-left:0.3rem;">＋ カテゴリ</button>
+            </div>
+        </div>
+        <div id="doe-s-factors"></div>
+    </div>
+
+    <!-- 計画設定 -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1rem;">
+        <div>
+            <label class="form-label">最適化基準</label>
+            <select id="doe-s-criterion" class="form-control" onchange="toggleOAOptions()">
+                <option value="D" selected>D最適（情報行列の行列式 最大化）</option>
+                <option value="E">E最適（最小固有値 最大化）</option>
+                <option value="I">I最適（予測分散 最小化）</option>
+                <option value="orthogonal">直交表</option>
+            </select>
+        </div>
+        <div id="doe-s-n-new-wrap">
+            <label class="form-label">追加する実験数</label>
+            <input type="number" id="doe-s-n-new" class="form-control" value="10" min="1" max="500">
+        </div>
+        <div id="doe-s-n-starts-wrap">
+            <label class="form-label">マルチスタート数</label>
+            <input type="number" id="doe-s-n-starts" class="form-control" value="5" min="1" max="50">
+        </div>
+        <div>
+            <label class="form-label">最大候補数</label>
+            <input type="number" id="doe-s-max-cand" class="form-control" value="5000" min="100" max="100000">
+        </div>
+    </div>
+    <div id="doe-s-oa-options" style="display:none;margin-bottom:1rem;">
+        <label class="form-label">直交表の種類</label>
+        <select id="doe-s-oa-type" class="form-control" style="max-width:300px;">
+            <option value="L4(2³)">L4 (2水準3因子)</option>
+            <option value="L8(2⁷)">L8 (2水準7因子)</option>
+            <option value="L9(3⁴)">L9 (3水準4因子)</option>
+            <option value="L12(2¹¹)">L12 (2水準11因子)</option>
+            <option value="L16(2¹⁵)">L16 (2水準15因子)</option>
+            <option value="L18(2¹×3⁷)">L18 (混合水準8因子)</option>
+            <option value="L27(3¹³)">L27 (3水準13因子)</option>
+        </select>
+    </div>
+
+    <button class="btn btn-primary" onclick="runSessionDoE('{{ session.id }}')" id="btn-run-doe-s">🧪 計画を生成</button>
+    <div id="doe-s-loading" style="display:none;margin-top:1rem;">
+        <div class="spinner" style="width:32px;height:32px;border:3px solid rgba(0,188,212,0.2);
+                    border-top-color:#00bcd4;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;vertical-align:middle;"></div>
+        <span style="color:var(--text-secondary);margin-left:0.5rem;">最適化計算中...</span>
+    </div>
+    <div id="doe-s-results" style="margin-top:1rem;"></div>
+</div>
+</div><!-- /高度な解析ツール -->
+
+<script>
+/* ─── タブ切替 ─── */
+function showAdvTab(tab) {
+    ['inverse','bayesian','doe','leakage'].forEach(t => {
+        document.getElementById('adv-panel-' + t).style.display = t === tab ? 'block' : 'none';
+        document.getElementById('adv-tab-' + t).className = t === tab ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-secondary';
+    });
+}
+function toggleInvRange() {
+    const mode = document.getElementById('inv-target-mode').value;
+    document.getElementById('inv-range-min-wrap').style.display = mode === 'range' ? '' : 'none';
+    document.getElementById('inv-range-max-wrap').style.display = mode === 'range' ? '' : 'none';
+}
+
+/* ─── 逆解析 ─── */
+async function runInverse(sid) {
+    const btn = document.getElementById('btn-run-inv');
+    const loading = document.getElementById('inv-loading');
+    btn.disabled = true; loading.style.display = 'block';
+    document.getElementById('inv-results').innerHTML = '';
+    try {
+        const resp = await fetch(`/api/session/${sid}/inverse/`, {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                method: document.getElementById('inv-method').value,
+                target_mode: document.getElementById('inv-target-mode').value,
+                target_min: parseFloat(document.getElementById('inv-target-min').value) || null,
+                target_max: parseFloat(document.getElementById('inv-target-max').value) || null,
+                constraints: {},
+                method_params: {n_samples: 2000, n_trials: 100, pop_size: 50, n_generations: 100},
+            })
+        });
+        const data = await resp.json();
+        if (data.error) throw new Error(data.error);
+        renderInverseResults(data);
+    } catch (e) {
+        document.getElementById('inv-results').innerHTML = `<div class="alert alert-error">❌ ${e.message}</div>`;
+    } finally {
+        btn.disabled = false; loading.style.display = 'none';
+    }
+}
+function renderInverseResults(data) {
+    const c = document.getElementById('inv-results');
+    let html = `<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
+        <div class="metric-card-mini"><div class="metric-value-sm">${data.method}</div><div class="metric-label-sm">手法</div></div>
+        <div class="metric-card-mini"><div class="metric-value-sm">${data.n_evaluated.toLocaleString()}</div><div class="metric-label-sm">評価数</div></div>
+        <div class="metric-card-mini"><div class="metric-value-sm">${data.best_predicted.toFixed(4)}</div><div class="metric-label-sm">最良予測値</div></div>
+        <div class="metric-card-mini"><div class="metric-value-sm">${data.elapsed_seconds}s</div><div class="metric-label-sm">実行時間</div></div>
+    </div>`;
+    if (data.candidates && data.candidates.length > 0) {
+        const cols = Object.keys(data.candidates[0]);
+        html += '<div style="overflow-x:auto;"><table class="data-table" style="font-size:0.8rem;"><thead><tr>';
+        for (const col of cols) html += `<th>${col}</th>`;
+        html += '</tr></thead><tbody>';
+        for (const row of data.candidates.slice(0, 20)) {
+            html += '<tr>';
+            for (const col of cols) html += `<td>${typeof row[col] === 'number' ? row[col].toFixed(4) : row[col]}</td>`;
+            html += '</tr>';
+        }
+        html += '</tbody></table></div>';
+    }
+    c.innerHTML = html;
+}
+
+/* ─── ベイズ最適化 ─── */
+async function runBO(sid) {
+    const btn = document.getElementById('btn-run-bo');
+    const loading = document.getElementById('bo-loading');
+    btn.disabled = true; loading.style.display = 'block';
+    document.getElementById('bo-results').innerHTML = '';
+    document.getElementById('bo-pca').innerHTML = '';
+    try {
+        const resp = await fetch(`/api/session/${sid}/bayesian_suggest/`, {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                objective: document.getElementById('bo-objective').value,
+                acquisition: document.getElementById('bo-acquisition').value,
+                kernel_type: document.getElementById('bo-kernel').value,
+                batch_strategy: document.getElementById('bo-batch').value,
+                n_candidates: parseInt(document.getElementById('bo-n-candidates').value) || 5,
+            })
+        });
+        const data = await resp.json();
+        if (data.error) throw new Error(data.error);
+        renderBOResults(data);
+    } catch (e) {
+        document.getElementById('bo-results').innerHTML = `<div class="alert alert-error">❌ ${e.message}</div>`;
+    } finally {
+        btn.disabled = false; loading.style.display = 'none';
+    }
+}
+function renderBOResults(data) {
+    const c = document.getElementById('bo-results');
+    let html = `<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
+        <div class="metric-card-mini"><div class="metric-value-sm">${data.n_train}</div><div class="metric-label-sm">学習データ数</div></div>`;
+    if (data.gp_info && data.gp_info.kernel) {
+        html += `<div class="metric-card-mini"><div class="metric-value-sm" style="font-size:0.65rem;">${data.gp_info.kernel}</div><div class="metric-label-sm">カーネル</div></div>`;
+    }
+    html += '</div>';
+    if (data.suggestions && data.suggestions.length > 0) {
+        const cols = Object.keys(data.suggestions[0]);
+        html += '<h4 style="margin:1rem 0 0.5rem;">📋 提案候補</h4>';
+        html += '<div style="overflow-x:auto;"><table class="data-table" style="font-size:0.8rem;"><thead><tr>';
+        for (const col of cols) html += `<th>${col}</th>`;
+        html += '</tr></thead><tbody>';
+        for (const row of data.suggestions) {
+            html += '<tr>';
+            for (const col of cols) html += `<td>${typeof row[col] === 'number' ? row[col].toFixed(4) : row[col]}</td>`;
+            html += '</tr>';
+        }
+        html += '</tbody></table></div>';
+    }
+    c.innerHTML = html;
+    // PCA可視化
+    if (data.pca) renderPCA(data.pca);
+}
+function renderPCA(pca) {
+    const container = document.getElementById('bo-pca');
+    const trainX = pca.train_2d.map(p => p.x);
+    const trainY = pca.train_2d.map(p => p.y);
+    const sugX = pca.suggest_2d.map(p => p.x);
+    const sugY = pca.suggest_2d.map(p => p.y);
+    container.innerHTML = '<div id="pca-plot" style="height:400px;"></div>';
+    if (typeof Plotly !== 'undefined') {
+        Plotly.newPlot('pca-plot', [
+            {x: trainX, y: trainY, mode: 'markers', name: '既存データ', marker: {color: '#3b82f6', size: 8}},
+            {x: sugX, y: sugY, mode: 'markers', name: '提案候補', marker: {color: '#f97316', size: 12, symbol: 'star'}},
+        ], {title: 'PCA 2D — 既存 vs 提案候補', paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: {color: '#94a3b8'}, xaxis: {title: 'PC1', gridcolor: 'rgba(255,255,255,0.05)'},
+            yaxis: {title: 'PC2', gridcolor: 'rgba(255,255,255,0.05)'}}, {responsive: true});
+    }
+}
+
+/* ─── リーケージ検出 ─── */
+async function runLeakageCheck(sid) {
+    const btn = document.getElementById('btn-run-leak');
+    const loading = document.getElementById('leak-loading');
+    btn.disabled = true; loading.style.display = 'block';
+    document.getElementById('leak-results').innerHTML = '';
+    try {
+        const resp = await fetch(`/api/session/${sid}/leakage/`, {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({})
+        });
+        const data = await resp.json();
+        if (data.error) throw new Error(data.error);
+        renderLeakageResults(data);
+    } catch (e) {
+        document.getElementById('leak-results').innerHTML = `<div class="alert alert-error">❌ ${e.message}</div>`;
+    } finally {
+        btn.disabled = false; loading.style.display = 'none';
+    }
+}
+function renderLeakageResults(data) {
+    const c = document.getElementById('leak-results');
+    let html = '';
+    // 特徴量レベル
+    const fc = data.feature_check;
+    html += `<div class="alert ${fc.has_risk ? 'alert-warning' : 'alert-success'}" style="margin-bottom:1rem;">${fc.summary}</div>`;
+    if (fc.warnings && fc.warnings.length > 0) {
+        html += '<table class="data-table" style="font-size:0.82rem;margin-bottom:1rem;"><thead><tr><th>特徴量</th><th>リスク</th><th>理由</th><th>スコア</th></tr></thead><tbody>';
+        for (const w of fc.warnings) {
+            const bc = w.risk === 'high' ? 'color:#ff5252;font-weight:600;' : 'color:#ffab40;';
+            html += `<tr><td>${w.feature}</td><td style="${bc}">${w.risk.toUpperCase()}</td><td>${w.reason}</td><td>${w.score.toFixed(3)}</td></tr>`;
+        }
+        html += '</tbody></table>';
+    }
+    // サンプルレベル
+    const sc = data.sample_check;
+    if (sc) {
+        const riskColor = sc.risk_level === 'high' ? '#ff5252' : sc.risk_level === 'medium' ? '#ffab40' : '#4ade80';
+        html += `<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
+            <div class="metric-card-mini"><div class="metric-value-sm" style="color:${riskColor}">${sc.risk_level.toUpperCase()}</div><div class="metric-label-sm">リスクレベル</div></div>
+            <div class="metric-card-mini"><div class="metric-value-sm">${sc.risk_score}</div><div class="metric-label-sm">リスクスコア</div></div>
+            <div class="metric-card-mini"><div class="metric-value-sm">${sc.n_suspicious_pairs}</div><div class="metric-label-sm">疑わしいペア数</div></div>
+            <div class="metric-card-mini"><div class="metric-value-sm">${sc.recommended_cv}</div><div class="metric-label-sm">推奨CV</div></div>
+            <div class="metric-card-mini"><div class="metric-value-sm">${sc.method_used}</div><div class="metric-label-sm">使用手法</div></div>
+        </div>`;
+        html += `<p style="color:var(--text-secondary);font-size:0.85rem;">📋 ${sc.cv_reason}</p>`;
+        if (sc.n_groups > 0) {
+            html += `<p style="color:var(--text-muted);font-size:0.82rem;">グループ数: ${sc.n_groups}</p>`;
+        }
+    }
+    c.innerHTML = html;
+}
+
+/* ─── DoE（実験計画法）─── */
+let doeSessionMode = 'augment';
+let doeFactorCounter = 0;
+let lastSessionDoeResult = null;
+
+function setDoeSessionMode(mode) {
+    doeSessionMode = mode;
+    document.getElementById('doe-s-mode-augment').className = mode === 'augment' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-secondary';
+    document.getElementById('doe-s-mode-scratch').className = mode === 'scratch' ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-secondary';
+}
+
+function toggleOAOptions() {
+    const isOA = document.getElementById('doe-s-criterion').value === 'orthogonal';
+    document.getElementById('doe-s-oa-options').style.display = isOA ? 'block' : 'none';
+    document.getElementById('doe-s-n-new-wrap').style.display = isOA ? 'none' : '';
+    document.getElementById('doe-s-n-starts-wrap').style.display = isOA ? 'none' : '';
+}
+
+function addSessionFactor(type, name = '', low = 0, high = 1, nLevels = 5, categories = '') {
+    doeFactorCounter++;
+    const id = `doe-sf-${doeFactorCounter}`;
+    const badgeClass = type === 'continuous' ? 'continuous' : 'categorical';
+    const badgeText = type === 'continuous' ? '連続値' : 'カテゴリ';
+    let fieldsHtml;
+    if (type === 'continuous') {
+        fieldsHtml = `
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:0.5rem;">
+                <div><label style="font-size:0.72rem;color:var(--text-muted);">下限</label>
+                    <input type="number" class="form-control" data-field="low" value="${low}" step="any"></div>
+                <div><label style="font-size:0.72rem;color:var(--text-muted);">上限</label>
+                    <input type="number" class="form-control" data-field="high" value="${high}" step="any"></div>
+                <div><label style="font-size:0.72rem;color:var(--text-muted);">水準数</label>
+                    <input type="number" class="form-control" data-field="n_levels" value="${nLevels}" min="2" max="100"></div>
+            </div>`;
+    } else {
+        fieldsHtml = `
+            <div><label style="font-size:0.72rem;color:var(--text-muted);">カテゴリ値（カンマ区切り）</label>
+                <input type="text" class="form-control" data-field="categories" value="${categories}" placeholder="例: A, B, C"></div>`;
+    }
+    const html = `
+        <div class="factor-card" id="${id}" data-type="${type}" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:0.8rem;margin-bottom:0.5rem;position:relative;">
+            <button onclick="document.getElementById('${id}').remove()" style="position:absolute;top:6px;right:6px;background:rgba(255,82,82,0.2);color:#ff5252;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:0.7rem;">✕</button>
+            <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.5rem;">
+                <span style="font-size:0.7rem;padding:2px 7px;border-radius:6px;font-weight:600;${type === 'continuous' ? 'background:rgba(0,188,212,0.2);color:#00e5ff;' : 'background:rgba(255,152,0,0.2);color:#ffab40;'}">${badgeText}</span>
+                <input type="text" class="form-control" data-field="name" value="${name}" placeholder="因子名" style="max-width:180px;font-weight:600;font-size:0.85rem;">
+            </div>
+            ${fieldsHtml}
+        </div>`;
+    document.getElementById('doe-s-factors').insertAdjacentHTML('beforeend', html);
+}
+
+async function autoDetectFactors(sid) {
+    try {
+        const resp = await fetch(`/api/session/${sid}/doe_factors/`, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: '{}' });
+        const data = await resp.json();
+        if (data.error) throw new Error(data.error);
+        document.getElementById('doe-s-factors').innerHTML = '';
+        doeFactorCounter = 0;
+        for (const f of data.factors) {
+            if (f.type === 'continuous') {
+                addSessionFactor('continuous', f.name, f.low, f.high, f.n_levels || 5);
+            } else {
+                addSessionFactor('categorical', f.name, 0, 1, 5, f.categories.join(', '));
+            }
+        }
+    } catch (e) {
+        alert('因子検出エラー: ' + e.message);
+    }
+}
+
+function collectSessionFactors() {
+    const cards = document.querySelectorAll('#doe-s-factors .factor-card');
+    const factors = [];
+    for (const card of cards) {
+        const type = card.dataset.type;
+        const name = (card.querySelector('[data-field="name"]')?.value || '').trim();
+        if (!name) continue;
+        if (type === 'continuous') {
+            factors.push({ name, type: 'continuous',
+                low: parseFloat(card.querySelector('[data-field="low"]')?.value) || 0,
+                high: parseFloat(card.querySelector('[data-field="high"]')?.value) || 1,
+                n_levels: parseInt(card.querySelector('[data-field="n_levels"]')?.value) || 5 });
+        } else {
+            const cats = (card.querySelector('[data-field="categories"]')?.value || '')
+                .split(',').map(s => s.trim()).filter(Boolean);
+            factors.push({ name, type: 'categorical', categories: cats });
+        }
+    }
+    return factors;
+}
+
+async function runSessionDoE(sid) {
+    const factors = collectSessionFactors();
+    if (factors.length === 0) { alert('因子を1つ以上設定してください。「データから自動検出」を押してみてください。'); return; }
+    const criterion = document.getElementById('doe-s-criterion').value;
+    const payload = {
+        factors, criterion, mode: doeSessionMode, session_id: sid,
+        n_new: parseInt(document.getElementById('doe-s-n-new').value) || 10,
+        n_starts: parseInt(document.getElementById('doe-s-n-starts').value) || 5,
+        max_candidates: parseInt(document.getElementById('doe-s-max-cand').value) || 5000,
+    };
+    if (criterion === 'orthogonal') payload.oa_type = document.getElementById('doe-s-oa-type').value;
+
+    const btn = document.getElementById('btn-run-doe-s');
+    const loading = document.getElementById('doe-s-loading');
+    btn.disabled = true; loading.style.display = 'block';
+    document.getElementById('doe-s-results').innerHTML = '';
+    try {
+        const resp = await fetch(`/api/session/${sid}/doe/`, {
+            method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+        const data = await resp.json();
+        if (data.error) throw new Error(data.error);
+        lastSessionDoeResult = data;
+        renderSessionDoeResults(data);
+    } catch (e) {
+        document.getElementById('doe-s-results').innerHTML = `<div class="alert alert-error">❌ ${e.message}</div>`;
+    } finally {
+        btn.disabled = false; loading.style.display = 'none';
+    }
+}
+
+function renderSessionDoeResults(data) {
+    const c = document.getElementById('doe-s-results');
+    let html = `<div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
+        <div class="metric-card-mini"><div class="metric-value-sm">${data.criterion_name || '—'}</div><div class="metric-label-sm">基準</div></div>
+        <div class="metric-card-mini"><div class="metric-value-sm">${typeof data.criterion_value === 'number' ? data.criterion_value.toFixed(4) : '—'}</div><div class="metric-label-sm">基準値</div></div>
+        <div class="metric-card-mini"><div class="metric-value-sm">${typeof data.d_efficiency === 'number' ? (data.d_efficiency * 100).toFixed(1) + '%' : '—'}</div><div class="metric-label-sm">D効率</div></div>
+        <div class="metric-card-mini"><div class="metric-value-sm">${data.n_existing || 0}</div><div class="metric-label-sm">既存点</div></div>
+        <div class="metric-card-mini"><div class="metric-value-sm">${data.n_new || 0}</div><div class="metric-label-sm">新規点</div></div>
+    </div>`;
+    if (data.rows && data.rows.length > 0) {
+        const cols = data.columns || Object.keys(data.rows[0]);
+        html += '<div style="overflow-x:auto;"><table class="data-table" style="font-size:0.8rem;"><thead><tr><th>#</th><th>区分</th>';
+        for (const c2 of cols) html += `<th>${c2}</th>`;
+        html += '</tr></thead><tbody>';
+        for (let i = 0; i < data.rows.length; i++) {
+            const row = data.rows[i];
+            const isNew = data.is_new ? data.is_new[i] : true;
+            const cls = isNew ? 'background:rgba(0,188,212,0.05);' : '';
+            const label = isNew ? '<span style="color:#00e5ff;font-size:0.72rem;font-weight:600;">🆕 新規</span>'
+                                : '<span style="color:var(--text-muted);font-size:0.72rem;">📌 既存</span>';
+            html += `<tr style="${cls}"><td>${i + 1}</td><td>${label}</td>`;
+            for (const c2 of cols) html += `<td>${typeof row[c2] === 'number' ? row[c2].toFixed(4) : (row[c2] ?? '—')}</td>`;
+            html += '</tr>';
+        }
+        html += '</tbody></table></div>';
+        html += `<button class="btn btn-secondary" onclick="downloadSessionDoeCSV()" style="margin-top:0.8rem;">📥 CSV ダウンロード</button>`;
+    }
+    c.innerHTML = html;
+}
+
+function downloadSessionDoeCSV() {
+    if (!lastSessionDoeResult) return;
+    const cols = lastSessionDoeResult.columns || Object.keys(lastSessionDoeResult.rows[0]);
+    let csv = cols.join(',') + '\n';
+    for (const row of lastSessionDoeResult.rows) csv += cols.map(c => row[c] ?? '').join(',') + '\n';
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `doe_plan_${lastSessionDoeResult.criterion_name || 'design'}.csv`;
+    a.click();
+}
+</script>
+
+{% elif session.status == 'running' %}
+<div class="alert alert-info">⏳ 解析を実行中です。しばらくお待ちください...</div>
+<script>
+setInterval(async () => {
+    const resp = await fetch(`/api/session/{{ session.id }}/status/`);
+    const d = await resp.json();
+    if (d.status === 'completed') location.reload();
+}, 3000);
+</script>
+{% elif session.status == 'error' %}
+<div class="alert alert-error">❌ エラー: {{ session.error_message }}</div>
+<a href="?step=analysis" class="btn btn-secondary">← 解析設定に戻る</a>
+{% else %}
+<div class="alert alert-info">📊 まず解析を実行してください。</div>
+<a href="?step=analysis" class="btn btn-primary">🚀 解析実行に進む</a>
+{% endif %}
+
+{% endif %}
+
+</div>
+
+<script>
+/* ─── プリセット選択 ─── */
+const PRESETS = {
+    solubility: { engines: ['rdkit', 'mordred', 'group_contrib'], label: '💧 溶解度予測：物性記述子を重視' },
+    activity:   { engines: ['rdkit', 'mordred', 'skfp', 'molai'], label: '🎯 活性予測：フィンガープリント+DL記述子を使用' },
+    toxicity:   { engines: ['rdkit', 'mordred', 'skfp', 'group_contrib'], label: '⚠️ 毒性予測：包括的物性+官能基記述子' },
+    all:        { engines: ['rdkit', 'mordred', 'skfp', 'molai', 'xtb', 'group_contrib'], label: '🔬 全エンジン選択' },
+};
+function selectPreset(key) {
+    const preset = PRESETS[key];
+    if (!preset) return;
+    document.querySelectorAll('#engine-grid input[type=checkbox]').forEach(cb => {
+        const eng = cb.dataset.engine;
+        cb.checked = preset.engines.includes(eng);
+    });
+    const info = document.getElementById('preset-info');
+    if (info) info.textContent = preset.label;
+}
+
+/* ─── 記述子計算 ─── */
+async function calculateDescriptors(sessionId) {
+    const btn = document.getElementById('btn-calc-desc');
+    const progress = document.getElementById('desc-progress');
+    const progressFill = document.getElementById('desc-progress-fill');
+    const progressText = document.getElementById('desc-progress-text');
+    const results = document.getElementById('desc-results');
+
+    btn.disabled = true;
+    btn.textContent = '計算中...';
+    progress.style.display = 'block';
+    progressFill.style.width = '30%';
+    progressText.textContent = 'エンジンを初期化中...';
+
+    try {
+        const resp = await fetch(`/api/session/${sessionId}/descriptors/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: '{}',
+        });
+        const data = await resp.json();
+        progressFill.style.width = '100%';
+
+        if (data.success) {
+            progressText.textContent = `✅ 完了: ${data.total_descriptors}個の記述子を計算`;
+            let html = '<div class="alert alert-success">✅ 計算完了</div>';
+            html += '<div class="metrics-grid">';
+            html += `<div class="metric-card"><div class="metric-value">${data.total_descriptors}</div><div class="metric-label">記述子数</div></div>`;
+            html += `<div class="metric-card"><div class="metric-value">${Object.keys(data.engines).length}</div><div class="metric-label">エンジン数</div></div>`;
+            html += '</div>';
+            results.innerHTML = html;
+        } else {
+            progressText.textContent = `❌ エラー: ${data.error}`;
+            results.innerHTML = `<div class="alert alert-error">${data.error}</div>`;
+        }
+    } catch (err) {
+        progressText.textContent = `❌ ネットワークエラー`;
+        results.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '⚗️ 全エンジンで記述子を計算';
+    }
+}
+
+/* ─── AutoML 解析実行 ─── */
+async function runAnalysis(sessionId) {
+    const btn = document.getElementById('btn-run-analysis');
+    const progress = document.getElementById('analysis-progress');
+    const progressFill = document.getElementById('analysis-progress-fill');
+    const progressText = document.getElementById('analysis-progress-text');
+    const summary = document.getElementById('analysis-result-summary');
+
+    const cvFolds = parseInt(document.getElementById('cv-folds')?.value || '5');
+
+    btn.disabled = true;
+    btn.textContent = '⏳ 解析実行中...';
+    progress.style.display = 'block';
+    progressFill.style.width = '20%';
+    progressText.textContent = 'AutoMLエンジン起動中...';
+
+    try {
+        progressFill.style.width = '40%';
+        progressText.textContent = '複数モデルで学習・交差検証中...（数十秒かかります）';
+
+        const resp = await fetch(`/api/session/${sessionId}/run/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cv_folds: cvFolds }),
+        });
+        const data = await resp.json();
+        progressFill.style.width = '100%';
+
+        if (data.success) {
+            const r = data.result;
+            progressText.textContent = `✅ 完了: 最良モデル ${r.best_model_key} (スコア: ${r.best_score.toFixed(4)})`;
+            summary.innerHTML = `
+                <div class="alert alert-success">
+                    🏆 最良モデル: <strong>${r.best_model_key}</strong>
+                    (${r.scoring}: ${r.best_score.toFixed(4)}) — ${r.elapsed_seconds.toFixed(1)}秒
+                </div>
+                <a href="?step=results" class="btn btn-primary" style="margin-top:0.5rem;">📊 結果を確認 →</a>
+            `;
+        } else {
+            progressText.textContent = `❌ エラー: ${data.error}`;
+            summary.innerHTML = `<div class="alert alert-error">${data.error}</div>`;
+        }
+    } catch (err) {
+        progressText.textContent = `❌ ネットワークエラー`;
+        summary.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '🚀 通常 AutoML（全列・単一セット）';
+    }
+}
+
+/* ─── 特徴量セット管理 ─── */
+let _fsCounter = 0;
+const _featureSetDefs = [];   // {id, name, descriptors, pipeline, rp_eps}
+
+function addFeatureSet() {
+    _fsCounter++;
+    const id = `fs${_fsCounter}`;
+    const def = { id, name: `特徴量セット${_fsCounter}`, descriptors: '', pipeline: 'normal', rp_eps: 0.1 };
+    _featureSetDefs.push(def);
+    _renderFeatureSets();
+}
+
+function removeFeatureSet(id) {
+    const idx = _featureSetDefs.findIndex(d => d.id === id);
+    if (idx >= 0) _featureSetDefs.splice(idx, 1);
+    _renderFeatureSets();
+}
+
+function _renderFeatureSets() {
+    const container = document.getElementById('feature-set-list');
+    if (!container) return;
+    container.innerHTML = _featureSetDefs.map((def, i) => {
+        const isHighdim = def.pipeline === 'highdim';
+        const pipeLabel = isHighdim
+            ? '<span style="background:rgba(255,152,0,0.2);color:#ffcc02;border:1px solid rgba(255,152,0,0.4);border-radius:4px;padding:1px 7px;font-size:0.72rem;font-weight:600;">🔬 特殊(JL-RP)</span>'
+            : '<span style="background:rgba(0,188,212,0.15);color:#00e5ff;border:1px solid rgba(0,188,212,0.3);border-radius:4px;padding:1px 7px;font-size:0.72rem;font-weight:600;">📊 通常</span>';
+        return `
+        <div id="fs-card-${def.id}" style="
+            background:rgba(0,30,60,0.5);border:1px solid rgba(0,188,212,0.2);
+            border-radius:10px;padding:0.875rem 1rem;position:relative;
+            ${isHighdim ? 'border-left:3px solid rgba(255,152,0,0.7);' : 'border-left:3px solid rgba(0,229,255,0.4);'}
+        ">
+            <!-- ヘッダー行 -->
+            <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.6rem;">
+                <span style="font-weight:700;color:var(--text-primary);">セット ${i+1}</span>
+                ${pipeLabel}
+                <input type="text" value="${def.name}"
+                    onchange="_featureSetDefs[${i}].name=this.value"
+                    style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);
+                           border-radius:6px;padding:3px 8px;color:#fff;font-size:0.82rem;flex:1;min-width:120px;"
+                    placeholder="セット名">
+                <button onclick="removeFeatureSet('${def.id}')" style="
+                    background:rgba(244,67,54,0.15);border:1px solid rgba(244,67,54,0.3);
+                    color:#f44336;border-radius:6px;padding:2px 10px;cursor:pointer;font-size:0.8rem;">✕</button>
+            </div>
+            <!-- パイプライン選択 -->
+            <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;margin-bottom:0.5rem;">
+                <label style="font-size:0.8rem;color:var(--text-secondary);">パイプライン:</label>
+                <label style="display:flex;align-items:center;gap:4px;font-size:0.82rem;cursor:pointer;">
+                    <input type="radio" name="pipe-${def.id}" value="normal"
+                        ${!isHighdim ? 'checked' : ''}
+                        onchange="_featureSetDefs[${i}].pipeline='normal';_renderFeatureSets();">
+                    📊 通常パイプライン
+                </label>
+                <label style="display:flex;align-items:center;gap:4px;font-size:0.82rem;cursor:pointer;">
+                    <input type="radio" name="pipe-${def.id}" value="highdim"
+                        ${isHighdim ? 'checked' : ''}
+                        onchange="_featureSetDefs[${i}].pipeline='highdim';_renderFeatureSets();">
+                    🔬 特殊(JL-RP): 高次元のみ適用
+                </label>
+                ${isHighdim ? `
+                <label style="display:flex;align-items:center;gap:4px;font-size:0.78rem;color:var(--text-muted);">
+                    ε=<input type="number" value="${def.rp_eps}" min="0.01" max="0.5" step="0.01"
+                        onchange="_featureSetDefs[${i}].rp_eps=parseFloat(this.value)"
+                        style="width:55px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);
+                               border-radius:4px;padding:2px 4px;color:#fff;font-size:0.78rem;">
+                    <span title="小さいほど精度↑次元↑">（JL歪み許容誤差）</span>
+                </label>` : ''}
+            </div>
+            <!-- 記述子列指定 -->
+            <div>
+                <label style="font-size:0.78rem;color:var(--text-secondary);">
+                    使用する記述子列（カンマ区切り、空=全列）:
+                </label>
+                <input type="text" value="${def.descriptors}"
+                    onchange="_featureSetDefs[${i}].descriptors=this.value"
+                    style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);
+                           border-radius:6px;padding:4px 8px;color:#ddd;font-size:0.78rem;margin-top:3px;
+                           font-family:monospace;"
+                    placeholder="例: MW,LogP,TPSA,HBD,HBA（空欄=全列使用）">
+            </div>
+        </div>`;
+    }).join('');
+}
+
+/* ─── マルチセット解析実行 ─── */
+async function runMultiAnalysis(sessionId) {
+    if (_featureSetDefs.length === 0) {
+        alert('特徴量セットを1つ以上追加してください。');
+        return;
+    }
+
+    const btn = document.getElementById('btn-run-multi');
+    const progress = document.getElementById('analysis-progress');
+    const progressFill = document.getElementById('analysis-progress-fill');
+    const progressText = document.getElementById('analysis-progress-text');
+    const summary = document.getElementById('analysis-result-summary');
+    const preview = document.getElementById('multi-result-preview');
+
+    const cvFolds = parseInt(document.getElementById('cv-folds')?.value || '5');
+
+    // セット定義をAPI用に変換
+    const featureSets = _featureSetDefs.map(def => ({
+        id: def.id,
+        name: def.name,
+        descriptors: def.descriptors ? def.descriptors.split(',').map(s => s.trim()).filter(Boolean) : [],
+        pipeline: def.pipeline,
+        rp_eps: parseFloat(def.rp_eps) || 0.1,
+    }));
+
+    btn.disabled = true;
+    btn.textContent = '⏳ マルチ解析中...';
+    progress.style.display = 'block';
+    progressFill.style.width = '10%';
+    progressText.textContent = `${featureSets.length}個の特徴量セットを解析中...`;
+    preview.style.display = 'none';
+
+    try {
+        progressFill.style.width = '30%';
+        progressText.textContent = '各セットでAutoML実行中（時間がかかります）...';
+
+        const resp = await fetch(`/api/session/${sessionId}/run_multi/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cv_folds: cvFolds, feature_sets: featureSets }),
+        });
+        const data = await resp.json();
+        progressFill.style.width = '100%';
+
+        if (data.success) {
+            const results = data.results;
+            const bestSet = results.find(r => r.is_best_set) || results[0];
+            progressText.textContent = `✅ ${results.length}セット完了 — 最良: ${bestSet.set_name} (${bestSet.best_score.toFixed(4)})`;
+
+            summary.innerHTML = `
+                <div class="alert alert-success">
+                    🏆 最良セット: <strong>${bestSet.set_name}</strong>
+                    (${bestSet.scoring}: ${bestSet.best_score.toFixed(4)})
+                    — モデル: ${bestSet.best_model_key}
+                </div>
+                <a href="?step=results" class="btn btn-primary" style="margin-top:0.5rem;">📊 詳細結果を確認 →</a>
+            `;
+
+            // インライン結果カード表示
+            _renderMultiResults(results, preview);
+            preview.style.display = 'block';
+        } else {
+            progressText.textContent = `❌ エラー: ${data.error}`;
+            summary.innerHTML = `<div class="alert alert-error">${data.error}</div>`;
+        }
+    } catch (err) {
+        progressText.textContent = `❌ ネットワークエラー`;
+        summary.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
+    } finally {
+        btn.disabled = false;
+        btn.textContent = '🧩 マルチセット解析を開始';
+    }
+}
+
+/* ─── マルチ解析 結果カード描画 ─── */
+function _renderMultiResults(results, container) {
+    let html = '<h3 style="margin:0 0 1rem;color:#00e5ff;">🧩 特徴量セット別 解析結果</h3>';
+    html += '<div style="display:flex;flex-direction:column;gap:1rem;">';
+
+    for (const r of results) {
+        const isHighdim = r.pipeline_type === 'highdim';
+        const rpApplied = r.rp_applied;
+        const isBest = r.is_best_set;
+
+        // パイプラインバッジ
+        const pipeBadge = isHighdim
+            ? `<span style="background:rgba(255,152,0,0.2);color:#ffcc02;border:1px solid rgba(255,152,0,0.5);
+                            border-radius:5px;padding:2px 9px;font-size:0.73rem;font-weight:700;white-space:nowrap;">
+                🔬 特殊パイプライン(JL-RP)</span>`
+            : `<span style="background:rgba(0,188,212,0.15);color:#00e5ff;border:1px solid rgba(0,188,212,0.3);
+                            border-radius:5px;padding:2px 9px;font-size:0.73rem;font-weight:700;white-space:nowrap;">
+                📊 通常パイプライン</span>`;
+
+        // RP適用ステータス
+        let rpStatus = '';
+        if (isHighdim) {
+            if (rpApplied) {
+                rpStatus = `<span style="color:#76ff03;font-size:0.78rem;">
+                    ✅ JL-RP適用: ${r.n_features_in} → ${r.n_features_out} 次元削減
+                    (SparseRandomProjection)</span>`;
+            } else {
+                rpStatus = `<span style="color:var(--text-muted);font-size:0.78rem;">
+                    ⏭ JL条件不成立: Passthrough（削減不要）</span>`;
+            }
+        }
+
+        const bestBorder = isBest ? '2px solid #00e5ff' : '1px solid rgba(255,255,255,0.1)';
+        const bestBg = isBest
+            ? 'background:linear-gradient(135deg,rgba(0,60,120,0.5),rgba(0,40,80,0.4));'
+            : 'background:rgba(0,20,40,0.4);';
+
+        // モデル比較テーブル（上位3件）
+        const sorted = Object.entries(r.model_details).sort((a, b) => b[1].mean - a[1].mean);
+        const top3 = sorted.slice(0, 3);
+        const tableRows = top3.map(([k, d]) => {
+            const ib = k === r.best_model_key;
+            return `<tr style="${ib ? 'color:#00e5ff;font-weight:600;' : 'color:var(--text-secondary);'}">
+                <td style="padding:3px 8px;">${ib ? '🏆 ' : ''}${k}</td>
+                <td style="padding:3px 8px;">${d.mean.toFixed(4)}</td>
+                <td style="padding:3px 8px;font-size:0.75rem;">±${d.std.toFixed(3)}</td>
+            </tr>`;
+        }).join('');
+
+        html += `
+        <div style="${bestBg}border:${bestBorder};border-radius:12px;padding:1rem 1.25rem;
+                     ${isBest ? 'box-shadow:0 0 16px rgba(0,229,255,0.15);' : ''}">
+            <!-- タイトル行 -->
+            <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.6rem;flex-wrap:wrap;">
+                ${isBest ? '<span style="font-size:1.4rem;">🏆</span>' : ''}
+                <strong style="font-size:1rem;color:${isBest ? '#00e5ff' : 'var(--text-primary)'};">
+                    ${r.set_name}
+                </strong>
+                ${pipeBadge}
+                ${isBest ? '<span style="color:#76ff03;font-size:0.78rem;font-weight:600;">← 最良セット</span>' : ''}
+            </div>
+            <!-- RP状態（高次元のみ） -->
+            ${rpStatus ? `<div style="margin-bottom:0.6rem;">${rpStatus}</div>` : ''}
+            <!-- メトリクスと比較テーブル -->
+            <div style="display:flex;gap:1.5rem;align-items:flex-start;flex-wrap:wrap;">
+                <!-- スコア -->
+                <div>
+                    <div style="font-size:1.8rem;font-weight:700;color:${isBest ? '#00e5ff' : '#fff'};">
+                        ${r.best_score.toFixed(4)}</div>
+                    <div style="font-size:0.72rem;color:var(--text-muted);">${r.scoring}</div>
+                    <div style="font-size:0.78rem;color:var(--text-secondary);margin-top:4px;">
+                        🏅 ${r.best_model_key}</div>
+                    <div style="font-size:0.72rem;color:var(--text-muted);">⏱ ${r.elapsed_seconds.toFixed(1)}s</div>
+                </div>
+                <!-- 上位モデル -->
+                <div style="flex:1;min-width:180px;">
+                    <table style="width:100%;font-size:0.8rem;border-collapse:collapse;">
+                        <thead><tr style="color:var(--text-muted);font-size:0.72rem;">
+                            <th style="text-align:left;padding:2px 8px;">モデル</th>
+                            <th style="text-align:left;padding:2px 8px;">スコア</th>
+                            <th style="text-align:left;padding:2px 8px;">σ</th>
+                        </tr></thead>
+                        <tbody>${tableRows}</tbody>
+                    </table>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+/* 初期セット追加（ページロード時に1つ表示） */
+document.addEventListener('DOMContentLoaded', () => {
+    const list = document.getElementById('feature-set-list');
+    if (list) addFeatureSet();
+});
+
+
+/* ─── 結果表示 ─── */
+async function loadResults(sessionId) {
+    const container = document.getElementById('results-content');
+    try {
+        const resp = await fetch(`/api/session/${sessionId}/results/`);
+        const data = await resp.json();
+        if (data.status !== 'completed' || !data.result) {
+            container.innerHTML = '<div class="alert alert-info">結果がまだありません。</div>';
+            return;
+        }
+        const r = data.result;
+
+        // ── マルチ結果か通常結果かを判別 ──
+        if (r.multi_results && Array.isArray(r.multi_results)) {
+            _renderMultiResultsPage(r.multi_results, container);
+            return;
+        }
+
+        // ── 通常結果（単一セット） ──
+        _renderSingleResult(r, container);
+    } catch (err) {
+        container.innerHTML = `<div class="alert alert-error">結果の読み込みに失敗: ${err.message}</div>`;
+    }
+}
+
+/* ─── 通常結果（単一セット）描画 ─── */
+function _renderSingleResult(r, container) {
+    let html = '';
+
+    // 最良モデルカード
+    html += `
+    <div style="background:linear-gradient(135deg,rgba(0,60,120,0.4),rgba(0,40,80,0.3));
+                border:1px solid rgba(0,188,212,0.4);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+            <span style="font-size:2rem;">🏆</span>
+            <div>
+                <h3 style="margin:0;color:#00e5ff;">${r.best_model_key}</h3>
+                <p style="margin:0;color:var(--text-secondary);">${r.scoring}: ${r.best_score.toFixed(4)} | ${r.elapsed_seconds.toFixed(1)}秒</p>
+            </div>
+        </div>
+        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+            <div class="metric-card-mini"><div class="metric-value-sm">${r.task}</div><div class="metric-label-sm">タスク</div></div>
+            <div class="metric-card-mini"><div class="metric-value-sm">${r.n_features}</div><div class="metric-label-sm">特徴量数</div></div>
+            <div class="metric-card-mini"><div class="metric-value-sm">${Object.keys(r.model_scores).length}</div><div class="metric-label-sm">比較モデル数</div></div>
+        </div>
+    </div>`;
+
+    // モデル比較テーブル
+    html += '<h3 style="margin:1rem 0 0.5rem;">📋 モデル比較</h3>';
+    html += '<table class="data-table"><thead><tr><th>モデル</th><th>スコア</th><th>±σ</th><th>学習時間</th></tr></thead><tbody>';
+    const sorted = Object.entries(r.model_details).sort((a, b) => b[1].mean - a[1].mean);
+    for (const [key, det] of sorted) {
+        const isBest = key === r.best_model_key;
+        const rowStyle = isBest ? 'background:rgba(0,188,212,0.1);font-weight:600;' : '';
+        html += `<tr style="${rowStyle}">
+            <td>${isBest ? '🏆 ' : ''}${key}</td>
+            <td>${det.mean.toFixed(4)}</td>
+            <td>±${det.std.toFixed(4)}</td>
+            <td>${det.fit_time.toFixed(2)}s</td>
+        </tr>`;
+    }
+    html += '</tbody></table>';
+
+    // スコア棒グラフ用div
+    html += '<div id="score-chart" style="margin-top:1.5rem;"></div>';
+
+    // 警告
+    if (r.warnings && r.warnings.length > 0) {
+        html += '<h3 style="margin:1rem 0 0.5rem;">⚠️ 警告</h3><ul>';
+        for (const w of r.warnings) {
+            html += `<li style="color:var(--text-secondary);font-size:0.85rem;">${w}</li>`;
+        }
+        html += '</ul>';
+    }
+
+    container.innerHTML = html;
+
+    // Plotly スコア棒グラフ
+    if (typeof Plotly !== 'undefined') {
+        const names = sorted.map(([k]) => k);
+        const scores = sorted.map(([, v]) => v.mean);
+        const errors = sorted.map(([, v]) => v.std);
+        const colors = names.map(n => n === r.best_model_key ? '#00e5ff' : '#4c9be8');
+
+        Plotly.newPlot('score-chart', [{
+            type: 'bar', x: names, y: scores,
+            error_y: { type: 'data', array: errors, visible: true },
+            marker: { color: colors },
+        }], {
+            title: { text: 'モデル比較 (CVスコア)', font: { color: '#ccc' } },
+            yaxis: { title: r.scoring, color: '#ccc', gridcolor: 'rgba(255,255,255,0.05)' },
+            xaxis: { color: '#ccc' },
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#ccc' }, height: 300,
+            margin: { l: 60, r: 20, t: 40, b: 60 },
+        });
+    }
+}
+
+/* ─── マルチ結果ページ描画（結果タブ用） ─── */
+function _renderMultiResultsPage(results, container) {
+    const bestSet = results.find(r => r.is_best_set) || results[0];
+    let html = '';
+
+    // 全体サマリー
+    html += `
+    <div style="background:linear-gradient(135deg,rgba(0,60,120,0.5),rgba(0,40,80,0.4));
+                border:1px solid rgba(0,188,212,0.4);border-radius:12px;padding:1.5rem;margin-bottom:1.5rem;">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1rem;">
+            <span style="font-size:2rem;">🧩</span>
+            <div>
+                <h3 style="margin:0;color:#00e5ff;">マルチセット解析結果</h3>
+                <p style="margin:0;color:var(--text-secondary);">
+                    ${results.length}セット比較 — 最良: ${bestSet.set_name} (${bestSet.best_model_key})
+                </p>
+            </div>
+        </div>
+        <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+            <div class="metric-card-mini">
+                <div class="metric-value-sm">${results.length}</div>
+                <div class="metric-label-sm">セット数</div>
+            </div>
+            <div class="metric-card-mini">
+                <div class="metric-value-sm">${bestSet.best_score.toFixed(4)}</div>
+                <div class="metric-label-sm">最良スコア</div>
+            </div>
+            <div class="metric-card-mini">
+                <div class="metric-value-sm">${results.filter(r => r.pipeline_type === 'highdim').length}</div>
+                <div class="metric-label-sm">JL-RPセット</div>
+            </div>
+        </div>
+    </div>`;
+
+    // セット比較テーブル
+    html += '<h3 style="margin:1rem 0 0.5rem;">📋 セット比較一覧</h3>';
+    html += `<table class="data-table">
+        <thead><tr>
+            <th>セット</th><th>パイプライン</th><th>JL-RP</th>
+            <th>最良モデル</th><th>スコア</th><th>±σ</th><th>時間</th>
+        </tr></thead><tbody>`;
+    for (const s of results) {
+        const isBest = s.is_best_set;
+        const rowStyle = isBest ? 'background:rgba(0,188,212,0.1);font-weight:600;' : '';
+        const pipeBadge = s.pipeline_type === 'highdim'
+            ? '<span style="color:#ffcc02;font-size:0.78rem;">🔬 特殊(JL-RP)</span>'
+            : '<span style="color:#00e5ff;font-size:0.78rem;">📊 通常</span>';
+        let rpCell = '—';
+        if (s.pipeline_type === 'highdim') {
+            rpCell = s.rp_applied
+                ? `<span style="color:#76ff03;font-size:0.78rem;">✅ ${s.n_features_in}→${s.n_features_out}</span>`
+                : '<span style="color:var(--text-muted);font-size:0.78rem;">⏭ 不要</span>';
+        }
+        const bestDet = s.model_details[s.best_model_key] || {};
+        html += `<tr style="${rowStyle}">
+            <td>${isBest ? '🏆 ' : ''}${s.set_name}</td>
+            <td>${pipeBadge}</td>
+            <td>${rpCell}</td>
+            <td>${s.best_model_key}</td>
+            <td>${s.best_score.toFixed(4)}</td>
+            <td>±${(bestDet.std || 0).toFixed(4)}</td>
+            <td>${s.elapsed_seconds.toFixed(1)}s</td>
+        </tr>`;
+    }
+    html += '</tbody></table>';
+
+    // セット別スコア棒グラフ
+    html += '<div id="multi-score-chart" style="margin-top:1.5rem;"></div>';
+
+    // 各セットの詳細カード
+    html += '<h3 style="margin:1.5rem 0 0.75rem;">📊 セット別詳細</h3>';
+    const previewContainer = document.createElement('div');
+    // _renderMultiResults は既に定義済み（解析実行ステップ内の関数を再利用）
+    if (typeof _renderMultiResults === 'function') {
+        const tmpDiv = document.createElement('div');
+        _renderMultiResults(results, tmpDiv);
+        html += tmpDiv.innerHTML;
+    }
+
+    container.innerHTML = html;
+
+    // Plotly: セット比較棒グラフ
+    if (typeof Plotly !== 'undefined') {
+        const names = results.map(r => r.set_name);
+        const scores = results.map(r => r.best_score);
+        const colors = results.map(r =>
+            r.is_best_set ? '#00e5ff' : (r.pipeline_type === 'highdim' ? '#ffcc02' : '#4c9be8')
+        );
+        Plotly.newPlot('multi-score-chart', [{
+            type: 'bar', x: names, y: scores,
+            marker: { color: colors },
+            text: results.map(r => r.best_model_key),
+            textposition: 'auto',
+        }], {
+            title: { text: 'セット別ベストスコア比較', font: { color: '#ccc' } },
+            yaxis: { title: results[0]?.scoring || 'score', color: '#ccc', gridcolor: 'rgba(255,255,255,0.05)' },
+            xaxis: { color: '#ccc' },
+            paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+            font: { color: '#ccc' }, height: 320,
+            margin: { l: 60, r: 20, t: 40, b: 80 },
+        });
+    }
+}
+</script>
+{% endblock %}

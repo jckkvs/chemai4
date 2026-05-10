@@ -1,0 +1,100 @@
+# ============================================
+# ChemAI ML Studio - Requirements
+# ============================================
+#
+# インストール方法:
+#   pip install -r requirements.txt
+#
+# 個別インストール（例: GGUFのみ）:
+#   pip install llama-cpp-python huggingface-hub
+#
+# Windowsでのllama-cpp-pythonインストール注意:
+#   - ビルドツールが必要な場合: pip install llama-cpp-python --no-binary llama-cpp-python
+#   - または、事前ビルド版を使用: conda install -c conda-forge llama-cpp-python
+#
+
+# ========== 核心依赖（必須） ==========
+numpy>=1.24
+scipy>=1.10
+pandas>=2.0
+scikit-learn>=1.3
+xgboost>=2.0
+matplotlib>=3.7
+seaborn>=0.12
+joblib>=1.3
+openpyxl>=3.1
+pyyaml>=6.0
+huggingface-hub>=0.20.0
+reportlab>=4.0
+python-docx>=1.1
+python-pptx>=0.6
+pdfplumber>=0.9
+nbformat>=5.9
+
+# ========== Web / GUI ==========
+streamlit>=1.30
+nicegui>=2.0
+plotly>=5.15
+django>=4.2
+djangorestframework>=3.14
+mlflow>=2.10
+
+# ========== バックグラウンドジョブ ==========
+celery>=5.3
+redis>=5.0
+psycopg2-binary>=2.9
+django-celery-results>=2.5
+pyarrow>=12.0
+
+# ========== GGUF/ローカルLLM（推奨） ==========
+llama-cpp-python>=0.2  # GGUFモデル（Qwen2.5-0.5B等）の実行に必要
+# 注: Windowsでエラーが出る場合は、conda-forgeからインストール:
+#   conda install -c conda-forge llama-cpp-python
+
+# ========== 推奨オプション ==========
+lightgbm>=4.0
+catboost>=1.2
+optuna>=3.4
+scikit-optimize>=0.9
+umap-learn>=0.5
+mordred>=1.2
+
+# ========== パイプライン拡張（オプション） ==========
+skrebate>=0.62           # ReliefF (scikit-rebate)
+boruta>=0.3              # Boruta
+sklearn-genetic-opt>=5.0 # GeneticSelection
+linear-tree>=0.6         # LinearTree
+group-lasso>=0.4         # GroupLasso
+imodels>=1.4             # 解釈可能モデル (FIGS, RuleFit等)
+shap>=0.44
+sage-importance>=0.0.6   # SAGE特徴量重要度
+shapiq>=1.0              # SHAP interactions (SRI分解)
+phate>=1.0               # PHATE 次元削減
+lime>=0.2                # LIME 局所解釈
+eli5>=0.13               # ELI5 特徴量重要度
+
+# ========== 化学記述子（オプション） ==========
+descriptastorus>=2.6     # Merck 高速記述子計算 (RDKit2D標準化)
+mol2vec>=0.1             # Word2Vec分子埋め込み (300次元)
+molfeat>=0.9             # Datamol統合FPフレームワーク
+scikit-fingerprints>=1.0 # 30種以上のフィンガープリント (ECFP, MACCS等)
+padelpy>=0.1             # PaDEL-Descriptor (1800+記述子, Java必要)
+chemprop>=2.0            # D-MPNN グラフニューラルネットワーク
+dscribe>=2.1             # 汎用記述子 (SOAP, ACSF, etc.)
+unipka>=1.0              # UniPka (pKa予測)
+
+# ========== 化学DLモデル（オプション） ==========
+torch>=2.0
+mace-torch>=0.3
+torchani>=2.2
+deepchem>=2.7
+fairchem-core>=2.17      # Meta UMA (Universal Model for Atoms)
+
+# ========== 開発用 ==========
+pytest>=7.4
+pytest-cov>=4.1
+black>=23.0
+ruff>=0.1
+playwright>=1.40
+pytest-playwright>=0.4
+mypy>=1.5

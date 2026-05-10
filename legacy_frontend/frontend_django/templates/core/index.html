@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}ダッシュボード - ChemAI ML Studio{% endblock %}
+
+{% block content %}
+<h1 class="hero-title">⚗️ ChemAI ML Studio</h1>
+<p class="hero-subtitle">化学AI機械学習プラットフォーム — Django Edition</p>
+
+<div class="grid grid-2">
+    <!-- 新規解析 -->
+    <div class="card">
+        <div class="card-header">
+            <span style="font-size:1.5rem">🚀</span>
+            <h2 class="card-title">新しい解析を始める</h2>
+        </div>
+        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+            CSVファイルをアップロードして、自動で記述子計算・機械学習・SHAPによる解釈まで行えます。
+        </p>
+        <a href="{% url 'new_session' %}" class="btn btn-primary btn-lg btn-block">
+            ✨ 新規解析セッション
+        </a>
+    </div>
+
+    <!-- 機能一覧 -->
+    <div class="card">
+        <div class="card-header">
+            <span style="font-size:1.5rem">🔬</span>
+            <h2 class="card-title">主な機能</h2>
+        </div>
+        <ul style="list-style: none; color: var(--text-secondary); line-height: 2;">
+            <li>📁 CSV / Excel ファイルのアップロード</li>
+            <li>⚗️ 14エンジンによる自動記述子計算（280+記述子）</li>
+            <li>🤖 AutoML（XGBoost, LightGBM, RF等）</li>
+            <li>📊 SHAP / PDP / Permutation Importance</li>
+            <li>🔬 逆解析（構造最適化）</li>
+        </ul>
+    </div>
+</div>
+
+{% if sessions %}
+<h2 style="margin: 2rem 0 1rem; font-size: 1.3rem;">📋 最近の解析セッション</h2>
+<div class="card" style="padding: 0; overflow: hidden;">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>名前</th>
+                <th>ファイル</th>
+                <th>データ</th>
+                <th>ステータス</th>
+                <th>更新日時</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in sessions %}
+            <tr>
+                <td style="font-weight:500">{{ s.name }}</td>
+                <td>{{ s.original_filename|default:"—" }}</td>
+                <td>{{ s.n_rows }}行 × {{ s.n_cols }}列</td>
+                <td>
+                    <span class="nav-badge" style="
+                        {% if s.status == 'completed' %}background:rgba(74,222,128,0.2);color:#4ade80;
+                        {% elif s.status == 'error' %}background:rgba(239,68,68,0.2);color:#f87171;
+                        {% elif s.status == 'running' %}background:rgba(0,212,255,0.2);color:#00d4ff;
+                        {% else %}background:rgba(255,255,255,0.1);color:var(--text-muted);{% endif %}
+                    ">{{ s.get_status_display }}</span>
+                </td>
+                <td style="color:var(--text-muted);font-size:0.8rem">
+                    {{ s.updated_at|date:"Y-m-d H:i" }}
+                </td>
+                <td>
+                    <a href="{% url 'session_detail' s.id %}" class="btn btn-sm btn-secondary">開く</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

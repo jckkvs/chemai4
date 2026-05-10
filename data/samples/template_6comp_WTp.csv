@@ -1,0 +1,2 @@
+Sample_ID,Compound_1_SMILES,Compound_1_WT%,Compound_2_SMILES,Compound_2_WT%,Compound_3_SMILES,Compound_3_WT%,Compound_4_SMILES,Compound_4_WT%,Compound_5_SMILES,Compound_5_WT%,Compound_6_SMILES,Compound_6_WT%,Target_Property
+SAMPLE001,CCO,20.0,CC1=CC=CC=C1,20.0,c1ccccc1,20.0,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,20.0,CC(C)Cc1ccc(cc1)C(C)C(=O)O,10.0,CCC1=CC(=C(C=C1)O)C=O,10.0,0.00

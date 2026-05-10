@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ChemAI ML Studio{% endblock %}</title>
+    <meta name="description" content="ChemAI ML Studio - 化学AI機械学習プラットフォーム">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/plotly.js@2/dist/plotly.min.css">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- サイドバー -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h1 class="logo">⚗️ ChemAI</h1>
+            <span class="logo-sub">ML Studio</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'index' %}" class="nav-link {% if active_page == 'home' %}active{% endif %}">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">ダッシュボード</span>
+            </a>
+            {% if session %}
+            <div class="nav-section-title">解析ステップ</div>
+            <a href="{% url 'session_detail' session.id %}?step=data"
+               class="nav-link {% if step == 'data' %}active{% endif %}">
+                <span class="nav-icon">📁</span>
+                <span class="nav-text">データ読込</span>
+                {% if session.status != 'created' %}<span class="nav-badge done">✓</span>{% endif %}
+            </a>
+            <a href="{% url 'session_detail' session.id %}?step=columns"
+               class="nav-link {% if step == 'columns' %}active{% endif %}">
+                <span class="nav-icon">🎯</span>
+                <span class="nav-text">列の設定</span>
+                {% if session.target_col %}<span class="nav-badge done">✓</span>{% endif %}
+            </a>
+            <a href="{% url 'session_detail' session.id %}?step=smiles"
+               class="nav-link {% if step == 'smiles' %}active{% endif %}">
+                <span class="nav-icon">⚗️</span>
+                <span class="nav-text">SMILES特徴量</span>
+            </a>
+            <a href="{% url 'session_detail' session.id %}?step=analysis"
+               class="nav-link {% if step == 'analysis' %}active{% endif %}">
+                <span class="nav-icon">🚀</span>
+                <span class="nav-text">解析実行</span>
+            </a>
+            <a href="{% url 'session_detail' session.id %}?step=results"
+               class="nav-link {% if step == 'results' %}active{% endif %}">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">結果</span>
+            </a>
+            {% endif %}
+            <div class="nav-divider"></div>
+            <a href="{% url 'doe' %}" class="nav-link {% if active_page == 'doe' %}active{% endif %}">
+                <span class="nav-icon">📐</span>
+                <span class="nav-text">実験計画法</span>
+            </a>
+            <a href="{% url 'help' %}" class="nav-link">
+                <span class="nav-icon">❓</span>
+                <span class="nav-text">ヘルプ</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span class="version-badge">Django Edition</span>
+        </div>
+    </aside>
+
+    <!-- メインコンテンツ -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Scripts -->
+    <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

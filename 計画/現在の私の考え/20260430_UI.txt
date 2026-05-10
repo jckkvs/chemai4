@@ -1,0 +1,22 @@
+UIはstreamlit, nicegui, djangoなどの開発経験はあるが、streamlitは毎回rerunするから重い気がする。
+SMILES計算とかあるから。　でもどれがいいかわからないし、UIはstreamlit, nicegui, djangoのどれかが最良とも限らない気がする。
+
+【決定】
+・他のフロントエンド（streamlit, django, next.js等）は残しておく（保守・参考用）。
+・ただし、今後の開発はまずNiceGUIを優先して進める。
+・理由：Streamlitの毎回rerun問題がSMILES計算等で顕著になるため。NiceGUIはイベント駆動で状態管理がしやすく、LLMストリーミングにも向いている。
+・複数フロントエンドを併存させたまま開発を進め、将来的に必要に応じて整理する。
+
+
+C:\Users\horie\chemai2_qwen
+
+
+
+これに実装していたUIを勝手に消さないでほしい
+
+
+
+今のUI（C:\Users\horie\chemai2_cc）といい感じに統合すべき
+
+要するに過去のAIはユーザーが全部解析設定を手作業で設定するUIだった。　
+最新のUIは解析設定をLLMが補助することに加えて！、　解析設定以外の解析方針のヒヤリングや解析方針の提示、レポーティングなどをLLMが補佐する

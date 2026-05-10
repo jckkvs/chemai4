@@ -1,0 +1,26 @@
+Sample_ID,Compound_1_SMILES,Compound_1_WT%,Compound_2_SMILES,Compound_2_WT%,Target_Property,Notes
+MIX001,CCO,45.20,CC1=CC=CC=C1,54.80,2.15,Ethanol+Toluene weight%
+MIX002,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,33.70,CC(C)Cc1ccc(cc1)C(C)C(=O)O,66.30,6.80,Caffeine+Ibuprofen weight%
+MIX003,CC(C)O,58.40,CCC1=CC(=C(C=C1)O)C=O,41.60,3.42,Isopropanol+Vanillin weight%
+MIX004,c1ccccc1,22.15,CC1=CC=CC=C1,77.85,1.85,Benzene+Toluene weight%
+MIX005,CCO,75.00,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,25.00,4.12,Ethanol+Caffeine weight%
+MIX006,CC(C)O,40.55,CC1=CC=CC=C1,59.45,2.88,Isopropanol+Toluene weight%
+MIX007,CCC1=CC(=C(C=C1)O)C=O,63.20,c1ccccc1,36.80,3.65,Vanillin+Benzene weight%
+MIX008,CC(C)Cc1ccc(cc1)C(C)C(=O)O,50.00,CCO,50.00,5.90,Ibuprofen+Ethanol weight%
+MIX009,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,44.80,c1ccccc1,55.20,3.28,Caffeine+Benzene weight%
+MIX010,CC1=CC=CC=C1,30.25,CC(C)O,69.75,2.10,Toluene+Isopropanol weight%
+MIX011,CCC1=CC(=C(C=C1)O)C=O,38.90,CC(C)Cc1ccc(cc1)C(C)C(=O)O,61.10,7.15,Vanillin+Ibuprofen weight%
+MIX012,CCO,52.30,CCC1=CC(=C(C=C1)O)C=O,47.70,2.75,Ethanol+Vanillin weight%
+MIX013,c1ccccc1,27.60,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,72.40,4.55,Benzene+Caffeine weight%
+MIX014,CC(C)O,65.80,CC(C)Cc1ccc(cc1)C(C)C(=O)O,34.20,6.30,Isopropanol+Ibuprofen weight%
+MIX015,CC1=CC=CC=C1,41.15,CCC1=CC(=C(C=C1)O)C=O,58.85,3.98,Toluene+Vanillin weight%
+MIX016,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,55.50,CC1=CC=CC=C1,44.50,3.72,Caffeine+Toluene weight%
+MIX017,CCO,35.70,c1ccccc1,64.30,1.68,Ethanol+Benzene weight%
+MIX018,CC(C)Cc1ccc(cc1)C(C)C(=O)O,48.25,CC1=CC=CC=C1,51.75,4.85,Ibuprofen+Toluene weight%
+MIX019,CCC1=CC(=C(C=C1)O)C=O,42.80,CCO,57.20,2.92,Vanillin+Ethanol weight%
+MIX020,c1ccccc1,18.90,CC(C)O,81.10,2.35,Benzene+Isopropanol weight%
+MIX021,CC1=CC=CC=C1,60.35,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,39.65,5.10,Toluene+Caffeine weight%
+MIX022,CC(C)O,25.45,c1ccccc1,74.55,1.95,Isopropanol+Benzene weight%
+MIX023,CC(C)Cc1ccc(cc1)C(C)C(=O)O,70.10,CCC1=CC(=C(C=C1)O)C=O,29.90,6.60,Ibuprofen+Vanillin weight%
+MIX024,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,47.60,CCO,52.40,3.88,Caffeine+Ethanol weight%
+MIX025,CCC1=CC(=C(C=C1)O)C=O,53.75,CC1=CC=CC=C1,46.25,3.25,Vanillin+Toluene weight%

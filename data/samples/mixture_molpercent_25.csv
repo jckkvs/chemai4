@@ -1,0 +1,26 @@
+Sample_ID,Compound_1_SMILES,Compound_1_Mol%,Compound_2_SMILES,Compound_2_Mol%,Target_Property,Notes
+MIX001,CCO,50.00,CC1=CC=CC=C1,50.00,2.15,Ethanol+Toluene 1:1 mol%
+MIX002,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,35.00,CC(C)Cc1ccc(cc1)C(C)C(=O)O,65.00,6.80,Caffeine+Ibuprofen mol%
+MIX003,CC(C)O,60.00,CCC1=CC(=C(C=C1)O)C=O,40.00,3.42,Isopropanol+Vanillin mol%
+MIX004,c1ccccc1,25.00,CC1=CC=CC=C1,75.00,1.85,Benzene+Toluene mol%
+MIX005,CCO,70.00,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,30.00,4.12,Ethanol+Caffeine mol%
+MIX006,CC(C)O,45.00,CC1=CC=CC=C1,55.00,2.88,Isopropanol+Toluene mol%
+MIX007,CCC1=CC(=C(C=C1)O)C=O,65.00,c1ccccc1,35.00,3.65,Vanillin+Benzene mol%
+MIX008,CC(C)Cc1ccc(cc1)C(C)C(=O)O,50.00,CCO,50.00,5.90,Ibuprofen+Ethanol mol%
+MIX009,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,40.00,c1ccccc1,60.00,3.28,Caffeine+Benzene mol%
+MIX010,CC1=CC=CC=C1,35.00,CC(C)O,65.00,2.10,Toluene+Isopropanol mol%
+MIX011,CCC1=CC(=C(C=C1)O)C=O,42.00,CC(C)Cc1ccc(cc1)C(C)C(=O)O,58.00,7.15,Vanillin+Ibuprofen mol%
+MIX012,CCO,55.00,CCC1=CC(=C(C=C1)O)C=O,45.00,2.75,Ethanol+Vanillin mol%
+MIX013,c1ccccc1,30.00,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,70.00,4.55,Benzene+Caffeine mol%
+MIX014,CC(C)O,68.00,CC(C)Cc1ccc(cc1)C(C)C(=O)O,32.00,6.30,Isopropanol+Ibuprofen mol%
+MIX015,CC1=CC=CC=C1,48.00,CCC1=CC(=C(C=C1)O)C=O,52.00,3.98,Toluene+Vanillin mol%
+MIX016,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,58.00,CC1=CC=CC=C1,42.00,3.72,Caffeine+Toluene mol%
+MIX017,CCO,38.00,c1ccccc1,62.00,1.68,Ethanol+Benzene mol%
+MIX018,CC(C)Cc1ccc(cc1)C(C)C(=O)O,52.00,CC1=CC=CC=C1,48.00,4.85,Ibuprofen+Toluene mol%
+MIX019,CCC1=CC(=C(C=C1)O)C=O,44.00,CCO,56.00,2.92,Vanillin+Ethanol mol%
+MIX020,c1ccccc1,20.00,CC(C)O,80.00,2.35,Benzene+Isopropanol mol%
+MIX021,CC1=CC=CC=C1,62.00,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,38.00,5.10,Toluene+Caffeine mol%
+MIX022,CC(C)O,28.00,c1ccccc1,72.00,1.95,Isopropanol+Benzene mol%
+MIX023,CC(C)Cc1ccc(cc1)C(C)C(=O)O,72.00,CCC1=CC(=C(C=C1)O)C=O,28.00,6.60,Ibuprofen+Vanillin mol%
+MIX024,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,49.00,CCO,51.00,3.88,Caffeine+Ethanol mol%
+MIX025,CCC1=CC(=C(C=C1)O)C=O,56.00,CC1=CC=CC=C1,44.00,3.25,Vanillin+Toluene mol%

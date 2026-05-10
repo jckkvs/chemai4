@@ -1,0 +1,26 @@
+Sample_ID,Compound_1_SMILES,Compound_2_SMILES,Target_Property,Notes
+MIX001,CCO,CC1=CC=CC=C1,2.15,Ethanol+Toluene no ratio
+MIX002,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,CC(C)Cc1ccc(cc1)C(C)C(=O)O,6.80,Caffeine+Ibuprofen no ratio
+MIX003,CC(C)O,CCC1=CC(=C(C=C1)O)C=O,3.42,Isopropanol+Vanillin no ratio
+MIX004,c1ccccc1,CC1=CC=CC=C1,1.85,Benzene+Toluene no ratio
+MIX005,CCO,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,4.12,Ethanol+Caffeine no ratio
+MIX006,CC(C)O,CC1=CC=CC=C1,2.88,Isopropanol+Toluene no ratio
+MIX007,CCC1=CC(=C(C=C1)O)C=O,c1ccccc1,3.65,Vanillin+Benzene no ratio
+MIX008,CC(C)Cc1ccc(cc1)C(C)C(=O)O,CCO,5.90,Ibuprofen+Ethanol no ratio
+MIX009,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,c1ccccc1,3.28,Caffeine+Benzene no ratio
+MIX010,CC1=CC=CC=C1,CC(C)O,2.10,Toluene+Isopropanol no ratio
+MIX011,CCC1=CC(=C(C=C1)O)C=O,CC(C)Cc1ccc(cc1)C(C)C(=O)O,7.15,Vanillin+Ibuprofen no ratio
+MIX012,CCO,CCC1=CC(=C(C=C1)O)C=O,2.75,Ethanol+Vanillin no ratio
+MIX013,c1ccccc1,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,4.55,Benzene+Caffeine no ratio
+MIX014,CC(C)O,CC(C)Cc1ccc(cc1)C(C)C(=O)O,6.30,Isopropanol+Ibuprofen no ratio
+MIX015,CC1=CC=CC=C1,CCC1=CC(=C(C=C1)O)C=O,3.98,Toluene+Vanillin no ratio
+MIX016,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,CC1=CC=CC=C1,3.72,Caffeine+Toluene no ratio
+MIX017,CCO,c1ccccc1,1.68,Ethanol+Benzene no ratio
+MIX018,CC(C)Cc1ccc(cc1)C(C)C(=O)O,CC1=CC=CC=C1,4.85,Ibuprofen+Toluene no ratio
+MIX019,CCC1=CC(=C(C=C1)O)C=O,CCO,2.92,Vanillin+Ethanol no ratio
+MIX020,c1ccccc1,CC(C)O,2.35,Benzene+Isopropanol no ratio
+MIX021,CC1=CC=CC=C1,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,5.10,Toluene+Caffeine no ratio
+MIX022,CC(C)O,c1ccccc1,1.95,Isopropanol+Benzene no ratio
+MIX023,CC(C)Cc1ccc(cc1)C(C)C(=O)O,CCC1=CC(=C(C=C1)O)C=O,6.60,Ibuprofen+Vanillin no ratio
+MIX024,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,CCO,3.88,Caffeine+Ethanol no ratio
+MIX025,CCC1=CC(=C(C=C1)O)C=O,CC1=CC=CC=C1,3.25,Vanillin+Toluene no ratio

@@ -1,0 +1,51 @@
+﻿Compound_1_Name,Compound_1_SMILES,Compound_1_WT%,Compound_2_Name,Compound_2_SMILES,Compound_2_WT%,Compound_3_Name,Compound_3_SMILES,Compound_3_WT%,Compound_4_Name,Compound_4_SMILES,Compound_4_WT%,Sample_ID,Target_BoilingPoint_C
+Cyclohexane,C1CCCCC1,15.14,Isopropanol,CC(C)C,11.49,Caffeine,CN1=C(C(N(C1=O)=O)C)N(C)C,41.63,Ethanol,CCO,31.74,MIX_SMILES_0001,64.56
+Caffeine,CN1=C(C(N(C1=O)=O)C)N(C)C,54.38,Benzene,c1ccccc1,45.62,,,,,,,MIX_SMILES_0002,84.65
+Ethanol,CCO,34.85,Isopropanol,CC(C)C,12.27,Ibuprofen,CC(C)Cc1ccc(cc1)C(C)C(=O)O,35.48,Aspirin,CC(=O)Oc1ccccc1C(=O)O,17.4,MIX_SMILES_0003,71.5
+Isopropanol,CC(C)C,36.89,Ethanol,CCO,16.19,Benzene,c1ccccc1,29.04,Caffeine,CN1=C(C(N(C1=O)=O)C)N(C)C,17.88,MIX_SMILES_0004,46.59
+Ethanol,CCO,27.75,Cyclohexane,C1CCCCC1,25.59,Acetic Acid,CC(=O)O,46.66,,,,MIX_SMILES_0005,28.01
+Benzene,c1ccccc1,27.79,Isopropanol,CC(C)C,29.45,Caffeine,CN1=C(C(N(C1=O)=O)C)N(C)C,42.77,,,,MIX_SMILES_0006,76.98
+Isopropanol,CC(C)C,69.5,Aspirin,CC(=O)Oc1ccccc1C(=O)O,30.5,,,,,,,MIX_SMILES_0007,55.97
+Acetic Acid,CC(=O)O,60.05,Aspirin,CC(=O)Oc1ccccc1C(=O)O,39.95,,,,,,,MIX_SMILES_0008,65.76
+Cyclohexane,C1CCCCC1,21.55,Ethanol,CCO,16.81,Isopropanol,CC(C)C,32.45,Aspirin,CC(=O)Oc1ccccc1C(=O)O,29.19,MIX_SMILES_0009,48.72
+Aspirin,CC(=O)Oc1ccccc1C(=O)O,16.25,Cyclohexane,C1CCCCC1,51.17,Caffeine,CN1=C(C(N(C1=O)=O)C)N(C)C,32.58,,,,MIX_SMILES_0010,80.61
+Caffeine,CN1=C(C(N(C1=O)=O)C)N(C)C,29.03,Isopropanol,CC(C)C,32.31,Aspirin,CC(=O)Oc1ccccc1C(=O)O,38.66,,,,MIX_SMILES_0011,82.17
+Ethanol,CCO,42.74,Benzene,c1ccccc1,57.26,,,,,,,MIX_SMILES_0012,31.99
+Aspirin,CC(=O)Oc1ccccc1C(=O)O,29.37,Isopropanol,CC(C)C,70.63,,,,,,,MIX_SMILES_0013,49.42
+Acetic Acid,CC(=O)O,22.57,Aspirin,CC(=O)Oc1ccccc1C(=O)O,19.11,Isopropanol,CC(C)C,21.41,Benzene,c1ccccc1,36.91,MIX_SMILES_0014,47.63
+Benzene,c1ccccc1,57.56,Acetic Acid,CC(=O)O,42.44,,,,,,,MIX_SMILES_0015,38.06
+Cyclohexane,C1CCCCC1,34.23,Aspirin,CC(=O)Oc1ccccc1C(=O)O,30.58,Isopropanol,CC(C)C,35.19,,,,MIX_SMILES_0016,63.75
+Cyclohexane,C1CCCCC1,19.49,Isopropanol,CC(C)C,27.84,Ibuprofen,CC(C)Cc1ccc(cc1)C(C)C(=O)O,27.88,Ethanol,CCO,24.79,MIX_SMILES_0017,53.14
+Ethanol,CCO,61.53,Isopropanol,CC(C)C,38.47,,,,,,,MIX_SMILES_0018,19.07
+Ibuprofen,CC(C)Cc1ccc(cc1)C(C)C(=O)O,18.15,Benzene,c1ccccc1,11.16,Caffeine,CN1=C(C(N(C1=O)=O)C)N(C)C,36.07,Cyclohexane,C1CCCCC1,34.62,MIX_SMILES_0019,89.44
+Benzene,c1ccccc1,12.99,Ibuprofen,CC(C)Cc1ccc(cc1)C(C)C(=O)O,43.44,Isopropanol,CC(C)C,43.56,,,,MIX_SMILES_0020,71.04
+Caffeine,CN1=C(C(N(C1=O)=O)C)N(C)C,33.51,Isopropanol,CC(C)C,30.35,Aspirin,CC(=O)Oc1ccccc1C(=O)O,26.29,Ibuprofen,CC(C)Cc1ccc(cc1)C(C)C(=O)O,9.85,MIX_SMILES_0021,92.28
+Ethanol,CCO,74.5,Aspirin,CC(=O)Oc1ccccc1C(=O)O,25.5,,,,,,,MIX_SMILES_0022,35.81
+Acetic Acid,CC(=O)O,35.75,Isopropanol,CC(C)C,64.25,,,,,,,MIX_SMILES_0023,29.12
+Aspirin,CC(=O)Oc1ccccc1C(=O)O,32.41,Ethanol,CCO,35.61,Isopropanol,CC(C)C,31.98,,,,MIX_SMILES_0024,46.52
+Acetic Acid,CC(=O)O,26.4,Isopropanol,CC(C)C,73.6,,,,,,,MIX_SMILES_0025,30.95
+Isopropanol,CC(C)C,36.58,Ibuprofen,CC(C)Cc1ccc(cc1)C(C)C(=O)O,63.42,,,,,,,MIX_SMILES_0026,95.64
+Caffeine,CN1=C(C(N(C1=O)=O)C)N(C)C,40.97,Aspirin,CC(=O)Oc1ccccc1C(=O)O,11.12,Ibuprofen,CC(C)Cc1ccc(cc1)C(C)C(=O)O,15.93,Benzene,c1ccccc1,31.98,MIX_SMILES_0027,92.47
+Aspirin,CC(=O)Oc1ccccc1C(=O)O,27.55,Acetic Acid,CC(=O)O,24.57,Benzene,c1ccccc1,47.88,,,,MIX_SMILES_0028,54.43
+Caffeine,CN1=C(C(N(C1=O)=O)C)N(C)C,38.34,Acetic Acid,CC(=O)O,19.4,Benzene,c1ccccc1,14.02,Cyclohexane,C1CCCCC1,28.25,MIX_SMILES_0029,71.83
+Ibuprofen,CC(C)Cc1ccc(cc1)C(C)C(=O)O,27.58,Aspirin,CC(=O)Oc1ccccc1C(=O)O,43.23,Cyclohexane,C1CCCCC1,14.42,Isopropanol,CC(C)C,14.77,MIX_SMILES_0030,90.22
+Cyclohexane,C1CCCCC1,43.24,Isopropanol,CC(C)C,19.75,Ibuprofen,CC(C)Cc1ccc(cc1)C(C)C(=O)O,37.01,,,,MIX_SMILES_0031,78.5
+Ethanol,CCO,11.12,Benzene,c1ccccc1,24.79,Caffeine,CN1=C(C(N(C1=O)=O)C)N(C)C,26.11,Acetic Acid,CC(=O)O,37.98,MIX_SMILES_0032,63.04
+Acetic Acid,CC(=O)O,31.83,Benzene,c1ccccc1,30.56,Caffeine,CN1=C(C(N(C1=O)=O)C)N(C)C,37.61,,,,MIX_SMILES_0033,75.67
+Aspirin,CC(=O)Oc1ccccc1C(=O)O,26.73,Benzene,c1ccccc1,73.27,,,,,,,MIX_SMILES_0034,58.59
+Aspirin,CC(=O)Oc1ccccc1C(=O)O,9.46,Benzene,c1ccccc1,35.96,Acetic Acid,CC(=O)O,31.02,Isopropanol,CC(C)C,23.56,MIX_SMILES_0035,42.18
+Acetic Acid,CC(=O)O,38.53,Cyclohexane,C1CCCCC1,36.53,Isopropanol,CC(C)C,16.42,Benzene,c1ccccc1,8.53,MIX_SMILES_0036,33.64
+Acetic Acid,CC(=O)O,8.84,Cyclohexane,C1CCCCC1,26.72,Benzene,c1ccccc1,38.05,Aspirin,CC(=O)Oc1ccccc1C(=O)O,26.39,MIX_SMILES_0037,61.47
+Isopropanol,CC(C)C,51.18,Ethanol,CCO,48.82,,,,,,,MIX_SMILES_0038,18.96
+Acetic Acid,CC(=O)O,74.39,Cyclohexane,C1CCCCC1,25.61,,,,,,,MIX_SMILES_0039,38.94
+Aspirin,CC(=O)Oc1ccccc1C(=O)O,28.85,Ibuprofen,CC(C)Cc1ccc(cc1)C(C)C(=O)O,57.21,Acetic Acid,CC(=O)O,13.94,,,,MIX_SMILES_0040,108.15
+Acetic Acid,CC(=O)O,49.77,Benzene,c1ccccc1,50.23,,,,,,,MIX_SMILES_0041,35.67
+Isopropanol,CC(C)C,49.91,Benzene,c1ccccc1,50.09,,,,,,,MIX_SMILES_0042,36.16
+Benzene,c1ccccc1,61.01,Isopropanol,CC(C)C,38.99,,,,,,,MIX_SMILES_0043,34.87
+Ibuprofen,CC(C)Cc1ccc(cc1)C(C)C(=O)O,26.57,Cyclohexane,C1CCCCC1,28.3,Ethanol,CCO,45.12,,,,MIX_SMILES_0044,55.58
+Benzene,c1ccccc1,80.29,Cyclohexane,C1CCCCC1,19.71,,,,,,,MIX_SMILES_0045,40.97
+Ibuprofen,CC(C)Cc1ccc(cc1)C(C)C(=O)O,33.3,Benzene,c1ccccc1,32.45,Caffeine,CN1=C(C(N(C1=O)=O)C)N(C)C,20.16,Cyclohexane,C1CCCCC1,14.09,MIX_SMILES_0046,92.13
+Ibuprofen,CC(C)Cc1ccc(cc1)C(C)C(=O)O,36.76,Acetic Acid,CC(=O)O,63.24,,,,,,,MIX_SMILES_0047,70.79
+Isopropanol,CC(C)C,39.67,Ethanol,CCO,60.33,,,,,,,MIX_SMILES_0048,20.39
+Ibuprofen,CC(C)Cc1ccc(cc1)C(C)C(=O)O,51.56,Cyclohexane,C1CCCCC1,21.98,Aspirin,CC(=O)Oc1ccccc1C(=O)O,26.46,,,,MIX_SMILES_0049,104.57
+Isopropanol,CC(C)C,70.26,Caffeine,CN1=C(C(N(C1=O)=O)C)N(C)C,29.74,,,,,,,MIX_SMILES_0050,55.77

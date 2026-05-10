@@ -1,0 +1,26 @@
+Sample_ID,Compound_1_SMILES,Compound_1_WT%,Compound_1_Mol%,Compound_1_Vol%,Compound_2_SMILES,Compound_2_WT%,Compound_2_Mol%,Compound_2_Vol%,Target_Property,Notes
+MIX001,CCO,50.00,65.22,50.00,CC1=CC=CC=C1,50.00,34.78,50.00,2.15,Ethanol+Toluene Vol%=WT%
+MIX002,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,33.70,47.10,33.70,CC(C)Cc1ccc(cc1)C(C)C(=O)O,66.30,52.90,66.30,6.80,Caffeine+Ibuprofen Vol%=WT%
+MIX003,CC(C)O,58.40,68.90,58.40,CCC1=CC(=C(C=C1)O)C=O,41.60,31.10,41.60,3.42,Isopropanol+Vanillin Vol%=WT%
+MIX004,c1ccccc1,22.15,29.60,22.15,CC1=CC=CC=C1,77.85,70.40,77.85,1.85,Benzene+Toluene Vol%=WT%
+MIX005,CCO,75.00,84.70,75.00,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,25.00,15.30,25.00,4.12,Ethanol+Caffeine Vol%=WT%
+MIX006,CC(C)O,40.55,52.30,40.55,CC1=CC=CC=C1,59.45,47.70,59.45,2.88,Isopropanol+Toluene Vol%=WT%
+MIX007,CCC1=CC(=C(C=C1)O)C=O,63.20,72.40,63.20,c1ccccc1,36.80,27.60,36.80,3.65,Vanillin+Benzene Vol%=WT%
+MIX008,CC(C)Cc1ccc(cc1)C(C)C(=O)O,50.00,58.50,50.00,CCO,50.00,41.50,50.00,5.90,Ibuprofen+Ethanol Vol%=WT%
+MIX009,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,44.80,58.20,44.80,c1ccccc1,55.20,41.80,55.20,3.28,Caffeine+Benzene Vol%=WT%
+MIX010,CC1=CC=CC=C1,30.25,40.10,30.25,CC(C)O,69.75,59.90,69.75,2.10,Toluene+Isopropanol Vol%=WT%
+MIX011,CCC1=CC(=C(C=C1)O)C=O,38.90,49.80,38.90,CC(C)Cc1ccc(cc1)C(C)C(=O)O,61.10,50.20,61.10,7.15,Vanillin+Ibuprofen Vol%=WT%
+MIX012,CCO,52.30,66.20,52.30,CCC1=CC(=C(C=C1)O)C=O,47.70,33.80,47.70,2.75,Ethanol+Vanillin Vol%=WT%
+MIX013,c1ccccc1,27.60,37.50,27.60,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,72.40,62.50,72.40,4.55,Benzene+Caffeine Vol%=WT%
+MIX014,CC(C)O,65.80,75.60,65.80,CC(C)Cc1ccc(cc1)C(C)C(=O)O,34.20,24.40,34.20,6.30,Isopropanol+Ibuprofen Vol%=WT%
+MIX015,CC1=CC=CC=C1,41.15,52.30,41.15,CCC1=CC(=C(C=C1)O)C=O,58.85,47.70,58.85,3.98,Toluene+Vanillin Vol%=WT%
+MIX016,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,55.50,66.80,55.50,CC1=CC=CC=C1,44.50,33.20,44.50,3.72,Caffeine+Toluene Vol%=WT%
+MIX017,CCO,35.70,49.00,35.70,c1ccccc1,64.30,51.00,64.30,1.68,Ethanol+Benzene Vol%=WT%
+MIX018,CC(C)Cc1ccc(cc1)C(C)C(=O)O,48.25,57.10,48.25,CC1=CC=CC=C1,51.75,42.90,51.75,4.85,Ibuprofen+Toluene Vol%=WT%
+MIX019,CCC1=CC(=C(C=C1)O)C=O,42.80,53.60,42.80,CCO,57.20,46.40,57.20,2.92,Vanillin+Ethanol Vol%=WT%
+MIX020,c1ccccc1,18.90,27.20,18.90,CC(C)O,81.10,72.80,81.10,2.35,Benzene+Isopropanol Vol%=WT%
+MIX021,CC1=CC=CC=C1,60.35,70.10,60.35,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,39.65,29.90,39.65,5.10,Toluene+Caffeine Vol%=WT%
+MIX022,CC(C)O,25.45,36.80,25.45,c1ccccc1,74.55,63.20,74.55,1.95,Isopropanol+Benzene Vol%=WT%
+MIX023,CC(C)Cc1ccc(cc1)C(C)C(=O)O,70.10,77.30,70.10,CCC1=CC(=C(C=C1)O)C=O,29.90,22.70,29.90,6.60,Ibuprofen+Vanillin Vol%=WT%
+MIX024,CN1C=NC2=C1C(=O)N(C(=O)N2C)C,47.60,59.80,47.60,CCO,52.40,40.20,52.40,3.88,Caffeine+Ethanol Vol%=WT%
+MIX025,CCC1=CC(=C(C=C1)O)C=O,53.75,64.40,53.75,CC1=CC=CC=C1,46.25,35.60,46.25,3.25,Vanillin+Toluene Vol%=WT%

@@ -1,0 +1,119 @@
+import numpy as np
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.linear_model import Ridge
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_squared_error
+from sklearn.datasets import make_regression
+from sklearn.model_selection import train_test_split
+
+class HonestSoftTreeKernelRegressor:
+    def __init__(self, max_depth=6, alpha=1.0, temperature=0.15, rotation_seed=42, random_state=42):
+        self.max_depth = max_depth
+        self.alpha = alpha
+        self.temperature = temperature
+        self.rotation_seed = rotation_seed
+        self.random_state = random_state
+        
+        self.tree_ = None
+        self.ridge_ = None
+        self.scaler_ = StandardScaler()
+        self.rotation_matrix_ = None
+        self.leaf_map_ = None
+
+    def _rotate_features(self, X):
+        """Rotation Forest的拡張：QR分解による直交変換"""
+        rng = np.random.RandomState(self.rotation_seed)
+        n_features = X.shape[1]
+        Q, _ = np.linalg.qr(rng.randn(n_features, n_features))
+        self.rotation_matrix_ = Q
+
+    def _extract_soft_leaf_matrix(self, X):
+        """ソフト分割による葉確率行列の計算"""
+        n_samples = X.shape[0]
+        node_count = self.tree_.tree_.node_count
+        node_probs = np.zeros((n_samples, node_count))
+        node_probs[:, 0] = 1.0
+
+        # レベル順序でノードを走査
+        queue = [0]
+        while queue:
+            node = queue.pop(0)
+            left_child = self.tree_.tree_.children_left[node]
+            if left_child == -1:
+                continue  # 葉ノードは分割しない
+            
+            feat_idx = self.tree_.tree_.feature[node]
+            threshold = self.tree_.tree_.threshold[node]
+            right_child = self.tree_.tree_.children_right[node]
+
+            # シグモイドによるソフト分割確率
+            # x < threshold のとき左へ高確率
+            z = (threshold - X[:, feat_idx]) / self.temperature
+            p_left = 1.0 / (1.0 + np.exp(-z))
+            p_right = 1.0 - p_left
+
+            node_probs[:, left_child] += node_probs[:, node] * p_left
+            node_probs[:, right_child] += node_probs[:, node] * p_right
+            queue.extend([left_child, right_child])
+
+        # 葉ノードのみを抽出して行列化
+        leaf_indices = np.where(self.tree_.tree_.children_left == -1)[0]
+        self.leaf_map_ = {old_idx: i for i, old_idx in enumerate(leaf_indices)}
+        Phi = np.zeros((n_samples, len(leaf_indices)))
+        for old_idx, new_idx in self.leaf_map_.items():
+            Phi[:, new_idx] = node_probs[:, old_idx]
+        
+        # 行の合計が1になるように正規化（数値安定性向上）
+        row_sums = Phi.sum(axis=1, keepdims=True)
+        row_sums[row_sums == 0] = 1.0
+        return Phi / row_sums
+
+    def fit(self, X, y):
+        # 1. Honest Tree用データ分割
+        X_honest, y_honest = X.copy(), y.copy()
+        X_split, X_pred, y_split, y_pred = train_test_split(
+            X_honest, y_honest, test_size=0.5, random_state=self.random_state
+        )
+
+        # 2. 特徴空間の標準化と回転
+        self.scaler_.fit(X_split)
+        X_split_rot = self.scaler_.transform(X_split)
+        self._rotate_features(X_split_rot)
+        X_split_rot = X_split_rot @ self.rotation_matrix_
+
+        # 3. 構造学習（Honest Tree）
+        self.tree_ = DecisionTreeRegressor(max_depth=self.max_depth, random_state=self.random_state)
+        self.tree_.fit(X_split_rot, y_split)
+
+        # 4. 葉重み最適化用ソフト行列の構築
+        X_pred_rot = self.scaler_.transform(X_pred) @ self.rotation_matrix_
+        Phi_pred = self._extract_soft_leaf_matrix(X_pred_rot)
+
+        # 5. 正則化付き回帰による葉重みの決定
+        self.ridge_ = Ridge(alpha=self.alpha)
+        self.ridge_.fit(Phi_pred, y_pred)
+        return self
+
+    def predict(self, X):
+        X_rot = self.scaler_.transform(X) @ self.rotation_matrix_
+        Phi = self._extract_soft_leaf_matrix(X_rot)
+        return self.ridge_.predict(Phi)
+
+if __name__ == "__main__":
+    X, y = make_regression(n_samples=2000, n_features=15, noise=0.2, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # 提案手法
+    tk_model = HonestSoftTreeKernelRegressor(max_depth=8, alpha=0.5, temperature=0.12, rotation_seed=42, random_state=42)
+    tk_model.fit(X_train, y_train)
+    y_pred_tk = tk_model.predict(X_test)
+    mse_tk = mean_squared_error(y_test, y_pred_tk)
+
+    # 比較：Random Forest
+    from sklearn.ensemble import RandomForestRegressor
+    rfr = RandomForestRegressor(n_estimators=100, random_state=42)
+    rfr.fit(X_train, y_train)
+    mse_rfr = mean_squared_error(y_test, rfr.predict(X_test))
+
+    print(f"TREEKERNEL (Honest+Soft+Rotation) MSE: {mse_tk:.4f}")
+    print(f"RFR MSE: {mse_rfr:.4f}")

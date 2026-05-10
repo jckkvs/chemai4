@@ -1,0 +1,36 @@
+すべてのestimatorは動的、柔軟に引数の設定画面を準備せよ。　
+引数の設定画面について定義する
+デフォルトの引数　（たとえばRFRのn_estimatorsを設定できる）　
+　引数の設定はint, float, strings, T/F, list of int, list of stringsなど様々ありうる。
+　docstringからその設定可能なものを読み取って、UIに反映して
+
+
+    Parameters
+    ----------
+    n_estimators : int, default=100
+        The number of trees in the forest.
+
+また引数はGridSearchCVとOptunaSearchCVでのすべての引数の探索範囲も設定できるようにする
+GridSearchCVは有限個の範囲
+OptunaSearchCVは有限個ないし、無限個の範囲（max, min , log or not log、int or not int）で設定できるようにする
+
+なお、これらの設定は柔軟かつ動的に生成できるようにする。
+すなわり、ここにないライブラリのestimatorをユーザーが登録した場合、
+自動で、デフォルト引数、その設定UI,GridSearchCVとOptunaSearchCVでのすべての引数の探索範囲とそのUIが自動で生成されるということ
+
+各設定はタブにするかポップアップにするかそれ以外にするか、どうするかはあなたに任せるが、
+
+あとgridsearchcv(pipeline( (いろいろ, estimator)) , optunasearchcv(pipeline( (いろいろ, estimator)) 
+で渡すときの仕様を思い出してね。
+gridsearchcv(lasso)とかなら
+params= {"alpha":[0.1,0.2,0.3]}　とかだったと思うけど
+
+gridsearchcv(pipeline(estimator,lasso))とかなら
+params= {"estimator__alpha":[0.1,0.2,0.3]}　とかになるよね。
+ちょっと正確な指示じゃないけどがんばって
+
+
+推定機はユーザーがよくいじるものである。 UIとして目立たせて、かつスペースを多く取ってもよい。現在だと推定機タブを押す、線形系のexpanderを押す。ドラッグする。　各推定機を選ぶ。とよく使う機能なのにクリック数が多い。
+パッパッパとどんどん使う推定機を選べるようにできると最高
+
+ざっくり言えば除外～特徴選択までは前処理である。　であんまりいじらないのでUIとしてはスペースを使わず目立たなくてよい・

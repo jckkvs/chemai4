@@ -1,0 +1,505 @@
+{
+  "timestamp": "2026-05-05T07:54:38.010533",
+  "total_files": 15,
+  "load_ok": 15,
+  "parse_ok": 15,
+  "report_ok": 15,
+  "all_ok": 15,
+  "results": [
+    {
+      "file": "mixture_100_ml.csv",
+      "type": "mixture",
+      "load_ok": true,
+      "parse_ok": true,
+      "report_ok": true,
+      "error": null,
+      "shape": [
+        100,
+        16
+      ],
+      "columns": [
+        "Sample_ID",
+        "Compound_1_Name",
+        "Compound_2_Name",
+        "Compound_3_Name",
+        "Compound_1_SMILES",
+        "Compound_2_SMILES",
+        "Compound_3_SMILES",
+        "Compound_1_WT%",
+        "Compound_2_WT%",
+        "Compound_3_WT%",
+        "Temperature_C",
+        "Humidity_pct",
+        "Pressure_atm",
+        "StirringSpeed_rpm",
+        "ReactionTime_h",
+        "Target_Property"
+      ],
+      "dtypes": null,
+      "numeric_cols": 9,
+      "total_cols": 16,
+      "target_col": "Target_Property",
+      "target_dtype": "float64",
+      "target_stats": {
+        "mean": 129.8997731100028,
+        "std": 47.90789859397657,
+        "min": 52.68109021001207,
+        "max": 199.69011658000065
+      },
+      "report_path": "test_reports\\mixture_100_ml_report.md"
+    },
+    {
+      "file": "mixture_30_regression.csv",
+      "type": "mixture",
+      "load_ok": true,
+      "parse_ok": true,
+      "report_ok": true,
+      "error": null,
+      "shape": [
+        30,
+        13
+      ],
+      "columns": [
+        "Sample_ID",
+        "Compound_1_Name",
+        "Compound_2_Name",
+        "Compound_3_Name",
+        "Total_WT%",
+        "Notes",
+        "Compound_1_SMILES",
+        "Compound_1_WT%",
+        "Compound_2_SMILES",
+        "Compound_2_WT%",
+        "Compound_3_SMILES",
+        "Compound_3_WT%",
+        "Target_Property"
+      ],
+      "dtypes": null,
+      "numeric_cols": 5,
+      "total_cols": 13,
+      "target_col": "Target_Property",
+      "target_dtype": "float64",
+      "target_stats": {
+        "mean": 2.4701000000000004,
+        "std": 2.5880162733326237,
+        "min": -3.508,
+        "max": 6.936
+      },
+      "report_path": "test_reports\\mixture_30_regression_report.md"
+    },
+    {
+      "file": "mixture_30_simple.csv",
+      "type": "mixture",
+      "load_ok": true,
+      "parse_ok": true,
+      "report_ok": true,
+      "error": null,
+      "shape": [
+        30,
+        13
+      ],
+      "columns": [
+        "Notes",
+        "Compound_1_SMILES",
+        "Compound_1_Name",
+        "Compound_1_WT%",
+        "Compound_2_SMILES",
+        "Compound_2_Name",
+        "Compound_2_WT%",
+        "Compound_3_SMILES",
+        "Compound_3_Name",
+        "Compound_3_WT%",
+        "Target_Property",
+        "Sample_ID",
+        "Total_WT%"
+      ],
+      "dtypes": null,
+      "numeric_cols": 5,
+      "total_cols": 13,
+      "target_col": "Target_Property",
+      "target_dtype": "float64",
+      "target_stats": {
+        "mean": 2.4701000000000004,
+        "std": 2.5880162733326237,
+        "min": -3.508,
+        "max": 6.936
+      },
+      "report_path": "test_reports\\mixture_30_simple_report.md"
+    },
+    {
+      "file": "mixture_3_30_regression.csv",
+      "type": "mixture",
+      "load_ok": true,
+      "parse_ok": true,
+      "report_ok": true,
+      "error": null,
+      "shape": [
+        30,
+        13
+      ],
+      "columns": [
+        "Sample_ID",
+        "Compound_1_Name",
+        "Compound_2_Name",
+        "Compound_3_Name",
+        "Total_WT%",
+        "Notes",
+        "Compound_1_SMILES",
+        "Compound_1_WT%",
+        "Compound_2_SMILES",
+        "Compound_2_WT%",
+        "Compound_3_SMILES",
+        "Compound_3_WT%",
+        "Target_Property"
+      ],
+      "dtypes": null,
+      "numeric_cols": 5,
+      "total_cols": 13,
+      "target_col": "Target_Property",
+      "target_dtype": "float64",
+      "target_stats": {
+        "mean": 2.4701000000000004,
+        "std": 2.5880162733326237,
+        "min": -3.508,
+        "max": 6.936
+      },
+      "report_path": "test_reports\\mixture_3_30_regression_report.md"
+    },
+    {
+      "file": "mixture_50_debug_numeric.csv",
+      "type": "mixture",
+      "load_ok": true,
+      "parse_ok": true,
+      "report_ok": true,
+      "error": null,
+      "shape": [
+        50,
+        17
+      ],
+      "columns": [
+        "Sample_ID",
+        "Compound_1_Name",
+        "Compound_2_Name",
+        "Compound_3_Name",
+        "Compound_1_SMILES",
+        "Compound_1_WT%",
+        "Compound_2_SMILES",
+        "Compound_2_WT%",
+        "Compound_3_SMILES",
+        "Compound_3_WT%",
+        "Temperature_C",
+        "Humidity_pct",
+        "Pressure_atm",
+        "pH",
+        "StirringSpeed_rpm",
+        "ReactionTime_h",
+        "Boiling_Point_C(Target)"
+      ],
+      "dtypes": null,
+      "numeric_cols": 10,
+      "total_cols": 17,
+      "target_col": null,
+      "report_path": "test_reports\\mixture_50_debug_numeric_report.md"
+    },
+    {
+      "file": "smiles_100_classification.csv",
+      "type": "smiles",
+      "load_ok": true,
+      "parse_ok": true,
+      "report_ok": true,
+      "error": null,
+      "shape": [
+        100,
+        3
+      ],
+      "columns": [
+        "Compound_Name",
+        "SMILES",
+        "Class"
+      ],
+      "dtypes": null,
+      "numeric_cols": 1,
+      "total_cols": 3,
+      "target_col": "Class",
+      "target_dtype": "int64",
+      "target_stats": {
+        "mean": 0.3,
+        "std": 0.4605661864718382,
+        "min": 0.0,
+        "max": 1.0
+      },
+      "report_path": "test_reports\\smiles_100_classification_report.md"
+    },
+    {
+      "file": "smiles_100_ml.csv",
+      "type": "smiles",
+      "load_ok": true,
+      "parse_ok": true,
+      "report_ok": true,
+      "error": null,
+      "shape": [
+        100,
+        5
+      ],
+      "columns": [
+        "Compound_Name",
+        "SMILES",
+        "logS",
+        "MolecularWeight",
+        "NumAtoms"
+      ],
+      "dtypes": null,
+      "numeric_cols": 3,
+      "total_cols": 5,
+      "target_col": null,
+      "report_path": "test_reports\\smiles_100_ml_report.md"
+    },
+    {
+      "file": "smiles_100_regression.csv",
+      "type": "smiles",
+      "load_ok": true,
+      "parse_ok": true,
+      "report_ok": true,
+      "error": null,
+      "shape": [
+        100,
+        3
+      ],
+      "columns": [
+        "Compound_Name",
+        "SMILES",
+        "logS"
+      ],
+      "dtypes": null,
+      "numeric_cols": 1,
+      "total_cols": 3,
+      "target_col": null,
+      "report_path": "test_reports\\smiles_100_regression_report.md"
+    },
+    {
+      "file": "smiles_25_classification.csv",
+      "type": "smiles",
+      "load_ok": true,
+      "parse_ok": true,
+      "report_ok": true,
+      "error": null,
+      "shape": [
+        25,
+        3
+      ],
+      "columns": [
+        "Compound_Name",
+        "SMILES",
+        "Class"
+      ],
+      "dtypes": null,
+      "numeric_cols": 1,
+      "total_cols": 3,
+      "target_col": "Class",
+      "target_dtype": "int64",
+      "target_stats": {
+        "mean": 0.32,
+        "std": 0.4760952285695233,
+        "min": 0.0,
+        "max": 1.0
+      },
+      "report_path": "test_reports\\smiles_25_classification_report.md"
+    },
+    {
+      "file": "smiles_25_quick.csv",
+      "type": "smiles",
+      "load_ok": true,
+      "parse_ok": true,
+      "report_ok": true,
+      "error": null,
+      "shape": [
+        25,
+        4
+      ],
+      "columns": [
+        "Compound_Name",
+        "SMILES",
+        "logS",
+        "Class"
+      ],
+      "dtypes": null,
+      "numeric_cols": 2,
+      "total_cols": 4,
+      "target_col": "Class",
+      "target_dtype": "int64",
+      "target_stats": {
+        "mean": 0.44,
+        "std": 0.5066228051190221,
+        "min": 0.0,
+        "max": 1.0
+      },
+      "report_path": "test_reports\\smiles_25_quick_report.md"
+    },
+    {
+      "file": "smiles_25_regression.csv",
+      "type": "smiles",
+      "load_ok": true,
+      "parse_ok": true,
+      "report_ok": true,
+      "error": null,
+      "shape": [
+        25,
+        3
+      ],
+      "columns": [
+        "Compound_Name",
+        "SMILES",
+        "logS"
+      ],
+      "dtypes": null,
+      "numeric_cols": 1,
+      "total_cols": 3,
+      "target_col": null,
+      "report_path": "test_reports\\smiles_25_regression_report.md"
+    },
+    {
+      "file": "tabular_1000_large.csv",
+      "type": "tabular",
+      "load_ok": true,
+      "parse_ok": true,
+      "report_ok": true,
+      "error": null,
+      "shape": [
+        1000,
+        11
+      ],
+      "columns": [
+        "Feature_1",
+        "Feature_2",
+        "Feature_3",
+        "Feature_4",
+        "Feature_5",
+        "Feature_6",
+        "Feature_7",
+        "Feature_8",
+        "Target",
+        "Sample_ID",
+        "Category"
+      ],
+      "dtypes": null,
+      "numeric_cols": 9,
+      "total_cols": 11,
+      "target_col": "Target",
+      "target_dtype": "float64",
+      "target_stats": {
+        "mean": 100.36683533832436,
+        "std": 20.233708746008336,
+        "min": 23.266889030812607,
+        "max": 167.54765838165292
+      },
+      "report_path": "test_reports\\tabular_1000_large_report.md"
+    },
+    {
+      "file": "tabular_200_complex.csv",
+      "type": "tabular",
+      "load_ok": true,
+      "parse_ok": true,
+      "report_ok": true,
+      "error": null,
+      "shape": [
+        200,
+        11
+      ],
+      "columns": [
+        "Feature_1",
+        "Feature_2",
+        "Feature_3",
+        "Feature_4",
+        "Feature_5",
+        "Feature_6",
+        "Feature_7",
+        "Feature_8",
+        "Target",
+        "Sample_ID",
+        "Category"
+      ],
+      "dtypes": null,
+      "numeric_cols": 9,
+      "total_cols": 11,
+      "target_col": "Target",
+      "target_dtype": "float64",
+      "target_stats": {
+        "mean": 77.97996400508356,
+        "std": 15.70476460428684,
+        "min": 22.979327047085132,
+        "max": 122.76061605676384
+      },
+      "report_path": "test_reports\\tabular_200_complex_report.md"
+    },
+    {
+      "file": "tabular_50_safe.csv",
+      "type": "tabular",
+      "load_ok": true,
+      "parse_ok": true,
+      "report_ok": true,
+      "error": null,
+      "shape": [
+        50,
+        9
+      ],
+      "columns": [
+        "Feature_1",
+        "Feature_2",
+        "Feature_3",
+        "Feature_4",
+        "Feature_5",
+        "Feature_6",
+        "Feature_7",
+        "Feature_8",
+        "Target"
+      ],
+      "dtypes": null,
+      "numeric_cols": 9,
+      "total_cols": 9,
+      "target_col": "Target",
+      "target_dtype": "float64",
+      "target_stats": {
+        "mean": 6.635300861418568,
+        "std": 135.61607630633608,
+        "min": -202.220807295535,
+        "max": 342.422999608875
+      },
+      "report_path": "test_reports\\tabular_50_safe_report.md"
+    },
+    {
+      "file": "tabular_50_simple.csv",
+      "type": "tabular",
+      "load_ok": true,
+      "parse_ok": true,
+      "report_ok": true,
+      "error": null,
+      "shape": [
+        50,
+        9
+      ],
+      "columns": [
+        "Feature_1",
+        "Feature_2",
+        "Feature_3",
+        "Feature_4",
+        "Feature_5",
+        "Feature_6",
+        "Feature_7",
+        "Feature_8",
+        "Target"
+      ],
+      "dtypes": null,
+      "numeric_cols": 9,
+      "total_cols": 9,
+      "target_col": "Target",
+      "target_dtype": "float64",
+      "target_stats": {
+        "mean": 6.635300861418568,
+        "std": 135.61607630633608,
+        "min": -202.220807295535,
+        "max": 342.422999608875
+      },
+      "report_path": "test_reports\\tabular_50_simple_report.md"
+    }
+  ]
+}

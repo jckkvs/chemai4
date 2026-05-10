@@ -1,0 +1,83 @@
+<div id="auto-form-{{ form_id }}" class="bg-white p-4 rounded shadow" 
+     data-schema-url="{{ schema_url }}" 
+     data-submit-url="{{ submit_url }}">
+  
+  <div class="mb-3 {% if not searchable %}hidden{% endif %}">
+    <input type="text" placeholder="🔍 設定項目を検索..." class="form-control form-control-sm"
+           oninput="autoFormFilter('{{ form_id }}', this.value)">
+  </div>
+
+  <form id="form-fields-{{ form_id }}" hx-post="{{ submit_url }}" hx-target="#result-{{ form_id }}" hx-swap="innerHTML">
+    <div id="fields-container-{{ form_id }}" class="space-y-4"></div>
+    <button type="submit" class="btn btn-primary mt-3 w-full" id="btn-{{ form_id }}">計算実行</button>
+  </form>
+
+  <div id="result-{{ form_id }}" class="mt-4"></div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const el = document.getElementById(`auto-form-{{ form_id }}`);
+  if(el.dataset.schemaUrl) {
+      fetch(el.dataset.schemaUrl)
+        .then(r => r.json())
+        .then(s => renderAutoForm('{{ form_id }}', s));
+  }
+});
+
+const WIDGET_MAP = {
+  'integer': (n,p,v) => `<input type="range" name="${n}" min="${p.minimum||0}" max="${p.maximum||100}" value="${v||0}" class="form-range" oninput="this.nextElementSibling.value=this.value"><output class="badge bg-secondary">${v||0}</output>`,
+  'number':  (n,p,v) => `<input type="number" name="${n}" class="form-control" step="${p.step||'0.01'}" value="${v||0}">`,
+  'boolean': (n,p,v) => `<div class="form-check form-switch"><input type="checkbox" name="${n}" class="form-check-input" ${v?'checked':''}><label class="form-check-label">有効</label></div>`,
+  'select':  (n,p,v) => `<select name="${n}" class="form-select">${(p.enum||[]).map(o=>`<option ${o==v?'selected':''}>${o}</option>`).join('')}</select>`,
+  'default': (n,p,v) => `<input type="text" name="${n}" class="form-control" value="${v??''}">`
+};
+
+function renderAutoForm(id, schema) {
+  const container = document.getElementById(`fields-container-${id}`);
+  container.innerHTML = '';
+  const props = schema.properties || {};
+  const groups = schema['ui:groups'] || {};
+  const layout = schema['ui:layout'];
+
+  const renderField = (n, p) => {
+    const w = p['ui:widget'] || p.type || 'default';
+    const v = p.default ?? '';
+    const div = document.createElement('div');
+    div.className = 'form-group mb-2';
+    div.dataset.field = n;
+    
+    const widgetHtml = WIDGET_MAP[w] ? WIDGET_MAP[w](n,p,v) : WIDGET_MAP['default'](n,p,v);
+    
+    div.innerHTML = `<label class="form-label fw-bold">${n}${p['ui:help']?` <span class="text-muted small" title="${p['ui:help']}">ⓘ</span>`:''}</label> ${widgetHtml}`;
+    return div;
+  };
+
+  if (layout === 'accordion' && Object.keys(groups).length) {
+    Object.entries(groups).forEach(([g,fields]) => {
+      const acc = document.createElement('details');
+      acc.className = 'accordion-item mb-2 border rounded';
+      acc.innerHTML = `<summary class="fw-bold p-2 bg-light cursor-pointer">🔹 ${g.replace('_', ' ')}</summary><div class="p-2 accordion-body"></div>`;
+      fields.forEach(f => { 
+        if(props[f]) {
+            acc.querySelector('.accordion-body').appendChild(renderField(f, props[f]));
+        }
+      });
+      container.appendChild(acc);
+    });
+  } else {
+    Object.entries(props).forEach(([f,p]) => {
+        container.appendChild(renderField(f,p));
+    });
+  }
+}
+
+function autoFormFilter(id, q) {
+  q = q.toLowerCase();
+  document.querySelectorAll(`#fields-container-${id} [data-field]`).forEach(el => {
+    const match = el.dataset.field.toLowerCase().includes(q);
+    // 簡易的な表示切替
+    el.style.display = q === '' || match ? '' : 'none';
+  });
+}
+</script>
